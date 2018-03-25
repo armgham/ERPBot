@@ -4,7 +4,7 @@ import telegram
 import matplotlib.pyplot as plt
 from bidi.algorithm import get_display
 import persian_reshaper
-import matplotlib.font_manager as fm
+# import matplotlib.font_manager as fm
 from telegram import ReplyKeyboardMarkup
 
 
@@ -49,7 +49,7 @@ def main(user_data, bot, update):
             coms.append(get_display(persian_reshaper.reshape(data[3])))
         darss.append(get_display(persian_reshaper.reshape(data[4])))
     days2 = set(days)
-    prop = fm.FontProperties(fname='XP ZibaBd.ttf')
+    # prop = fm.FontProperties(fname='XP ZibaBd.ttf')
     dd = dict((ds(x), x) for x in days2)
     sorted_days = []
     for key in sorted(dd):
@@ -90,8 +90,9 @@ def main(user_data, bot, update):
                  '{0}:{1:0>2}'.format(int(data[2].split(':')[0]), int(data[2].split(':')[1])), va='top', fontsize=7)
         plt.text((starts[i] + ends[i]) * 0.5,
                  (sorted_days.index(days[i]) + 0.5 + sorted_days.index(days[i]) + 1.4) * 0.5 - 0.2,
-                 get_display(persian_reshaper.reshape(data[4])), ha='center', va='center', fontproperties=prop,
+                 get_display(persian_reshaper.reshape(data[4])), ha='center', va='center', 
                  fontsize=13 - 1.5 * len(temp4))
+        # fontproperties=prop,
         plt.text((starts[i] + ends[i]) * 0.5,
                  (sorted_days.index(days[i]) + sorted_days.index(days[i]) + 2.05) * 0.5,
                  get_display(persian_reshaper.reshape(data[3])), ha='center', va='center', fontsize=9 - len(temp3))
