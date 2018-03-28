@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import selenium.common.exceptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as ec
@@ -45,7 +46,9 @@ def main(user_data, bot, update):
         time_column_index = 11
 
         soup = BeautifulSoup(driver.page_source, 'html.parser')
+        driver.close()
         rows = soup.find_all('table', class_='grd')
+        del soup
         for column_index in range(len(rows[0].find_all('td'))):
             if rows[0].find_all('td')[column_index].find('span').text == 'زمان برگزاري':
                 time_column_index = column_index
@@ -77,12 +80,22 @@ def main(user_data, bot, update):
                                       parts_of_row[exams_time_column_index].find('span').text)
         text_process.main(user_data, bot, update)
         time_table_file.main(user_data, bot, update, from_scrp=True)
+        
+    except selenium.common.exceptions.TimeoutException:
+        print('selenium.common.exceptions.TimeoutException')
+        print(user_data)
+        bot.send_message(chat_id=update.message.chat_id,
+                         text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو درست '
+                              'بفرست اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
+        driver.close()
     except Exception as e:
         print(e.args)
         print(user_data)
         bot.send_message(chat_id=update.message.chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو درست '
                               'بفرست اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
-
-    finally:
-        driver.close()
+        try:
+            driver.close()
+        except Exception as e:
+            print(e.args)
+            pass
