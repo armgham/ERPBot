@@ -150,6 +150,7 @@ def main(user_data, bot, update, from_scrp=False):
     plt.savefig('{0}.png'.format(user_data['username'] + 'barn'), dpi=120)
     bot.send_document(chat_id=update.message.chat.id, document=open('{0}.png'.format(user_data['username'] + 'barn'),
                                                                     'rb'))
+    bot.send_chat_action(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
     bot.send_document(chat_id=update.message.chat.id, document=open('{0}.pdf'.format(user_data['username'] + 'barn'),
                                                                     'rb'), reply_markup=markup)
 
