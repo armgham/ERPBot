@@ -147,7 +147,7 @@ def main(user_data, bot, update, from_scrp=False):
     bot.send_message(chat_id=update.message.chat.id, text='داره میاد!!')
     bot.send_chat_action(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
     plt.savefig('{0}.pdf'.format(user_data['username'] + 'barn'))
-    plt.savefig('{0}.png'.format(user_data['username'] + 'barn'), dpi=150)
+    plt.savefig('{0}.png'.format(user_data['username'] + 'barn'), dpi=120)
     bot.send_document(chat_id=update.message.chat.id, document=open('{0}.png'.format(user_data['username'] + 'barn'),
                                                                     'rb'))
     bot.send_document(chat_id=update.message.chat.id, document=open('{0}.pdf'.format(user_data['username'] + 'barn'),
