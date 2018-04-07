@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import time
 import telegram
 import matplotlib as mpl
 mpl.use('Agg')
@@ -147,9 +148,11 @@ def main(user_data, bot, update, from_scrp=False):
     bot.send_message(chat_id=update.message.chat.id, text='داره میاد!!')
     bot.send_chat_action(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
     plt.savefig('{0}.pdf'.format(user_data['username'] + 'barn'))
+    time.sleep(1)
     plt.savefig('{0}.png'.format(user_data['username'] + 'barn'), dpi=120)
     bot.send_document(chat_id=update.message.chat.id, document=open('{0}.png'.format(user_data['username'] + 'barn'),
                                                                     'rb'))
+    time.sleep(2)
     bot.send_chat_action(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
     bot.send_document(chat_id=update.message.chat.id, document=open('{0}.pdf'.format(user_data['username'] + 'barn'),
                                                                     'rb'), reply_markup=markup)
