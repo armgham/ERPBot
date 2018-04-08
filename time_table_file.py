@@ -142,7 +142,7 @@ def main(user_data, bot, update, from_scrp=False):
     ax2.set_ylim(ax.get_ylim())
     ax2.set_xlim(ax.get_xlim())
     ax2.set_yticks(ax.get_yticks())
-    ax2.set_yticklabels(sorted_days)
+    ax2.set_yticklabels(sorted_days, fontsize=13)
     plt.subplots_adjust(left=0.06, bottom=0.26, right=0.95, top=0.96, wspace=0.2, hspace=0.2)
 
     bot.send_message(chat_id=update.message.chat.id, text='داره میاد!!')
