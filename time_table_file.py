@@ -120,8 +120,24 @@ def main(user_data, bot, update, from_scrp=False):
             int(k.group('y')) - 1) * 31 * 12].append(k.group()) for k
      in examsb if k is not None]
 
+    mtermsb = []
+    for line in user_data['midterm']:
+        pattern = r'^.*(?P<y>\d{4})\/(?P<m>\d{1,2})\/(?P<d>\d{1,2}).*$'
+        mtermsb.append(re.search(pattern, line))
+
+    mterms = dict(
+        (int(k.group('d')) + (int(k.group('m')) - 1) * 31 + (int(k.group('y')) - 1) * 31 * 12,
+         list()) for k in mtermsb
+        if k is not None)
+
+    [mterms[int(k.group('d')) + (int(k.group('m')) - 1) * 31 + (
+            int(k.group('y')) - 1) * 31 * 12].append(k.group()) for k
+     in mtermsb if k is not None]
+
     jj = 0
     exx = mx
+    plt.text(exx + 0.5, (1 + 5.5 * len(sorted_days)) * 0.2, get_display(persian_reshaper.reshape(':پایانترم')),
+             fontsize=13)
     for key in sorted(exams):
         for j in exams[key]:
             if jj == 8:
@@ -130,6 +146,22 @@ def main(user_data, bot, update, from_scrp=False):
             plt.text(exx, (jj + 1.5 + 5.5 * len(sorted_days)) * 0.2, get_display(persian_reshaper.reshape(j)),
                      fontsize=11)
             jj += 1
+    if from_scrp:
+        mterms = []
+    if not from_scrp:
+        if 'midterm' in user_data:
+            plt.text(mn - 0.05, (1 + 5.5 * len(sorted_days)) * 0.2, get_display(persian_reshaper.reshape('میانترم:')),
+                     fontsize=11)
+    jj2 = 0
+    exx = mn + 3
+    for key in sorted(mterms):
+        for j in mterms[key]:
+            if jj2 == 8:
+                exx += 4
+                jj2 = 0
+            plt.text(exx, (jj2 + 1.5 + 5.5 * len(sorted_days)) * 0.2, get_display(persian_reshaper.reshape(j)),
+                     fontsize=11)
+            jj2 += 1
 
     ax = fig.add_subplot(111)
 
