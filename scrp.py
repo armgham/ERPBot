@@ -63,6 +63,7 @@ def main(user_data, bot, update):
                 break
         rows = rows[0:number_of_rows + 1]
         user_data['first_info'] = []
+        user_data['midterm'] = []
         for row_index in range(len(rows)):
             parts_of_row = rows[row_index].find_all('td')
             user_data['first_info'].append(
