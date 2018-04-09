@@ -87,10 +87,41 @@ def edit(bot, update, user_data):
         update.message.reply_text('تو که هنوز برنامه ای نداری که بخوای ویرایشش کنی!! اول برنامتو بگیر بعد!',
                                   reply_markup=markup)
         return CHOOSING
-    edit_keyboard = [['ایجاد بخش جدید', 'حذف یک بخش']]
+    edit_keyboard = [['میانترم'], ['ایجاد بخش جدید', 'حذف یک بخش']]
     edit_markup = ReplyKeyboardMarkup(edit_keyboard, one_time_keyboard=True)
     update.message.reply_text('یکی رو انتخاب کن (اگه وسط راه پشیمون شدی میتونی /cancel رو بفرستی):',
                               reply_markup=edit_markup)
+    return CHOOSING
+
+
+def midterm(bot, update, user_data):
+    darss_keyboard = []
+    for exam in user_data['exams']:
+        darss_keyboard.append([exam[0:exam.find('   :   ')]])
+    darss_markup = ReplyKeyboardMarkup(darss_keyboard, one_time_keyboard=True)
+    update.message.reply_text('میانترم کدوم درس؟ :',
+                              reply_markup=darss_markup)
+    return CHOOSING_DARS
+
+
+def received_dars(bot, update, user_data):
+    dars = update.message.text
+    for ind in range(len(user_data['midterm'])):
+        if dars == user_data['midterm'][ind][0:user_data['midterm'][ind].find('  : ')]:
+            user_data['midterm'].remove(user_data['midterm'][ind])
+    user_data['edit'] = []
+    user_data['edit'].append(dars)
+    update.message.reply_text('خب توضیحات (مثلا تا کجا امتحانه یا هر چیز دیگه ای) با آخرش هم تاریخ میانترم رو به شکل yyyy/mm/dd بفرست :\n'
+                              'مثلا: تا صفحه 72 فصل دو حذف : 1397/02/15')
+    return DATE
+
+
+def received_date(bot, update, user_data):
+    date = update.message.text
+    user_data['edit'].append(date)
+    user_data['midterm'].append('  : '.join(user_data['edit']))
+    del user_data['edit']
+    _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
     return CHOOSING
 
 
