@@ -18,7 +18,7 @@ path = '/opt/app-root/src/phantomjs-2.1.1-linux-x86_64/bin'
 os.environ["PATH"] += os.pathsep + path
 os.environ["PATH"] += os.pathsep + '/opt/app-root/src'
 
-CHOOSING, TYPING_REPLY, TYPING_CHOICE, USERPASS, START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR = range(9)
+CHOOSING, TYPING_REPLY, TYPING_CHOICE, USERPASS, START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR, CHOOSING_DARS, DATE = range(11)
 
 reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (username, password)'],
                   ['گرفتن برنامه از erp'],
@@ -251,7 +251,21 @@ def main():
                        CommandHandler('cancel',
                                       cancel_edit,
                                       pass_user_data=True)],
-
+           
+            CHOOSING_DARS: [MessageHandler(Filters.text,
+                                           received_dars,
+                                           pass_user_data=True),
+                            CommandHandler('cancel',
+                                           cancel_edit,
+                                           pass_user_data=True)
+                            ],
+            DATE: [RegexHandler('.*\d{4}\/\d{1,2}\/\d{1,2}.*',
+                                received_date,
+                                pass_user_data=True),
+                   CommandHandler('cancel',
+                                  cancel_edit,
+                                  pass_user_data=True)
+                   ],
             USERPASS: [MessageHandler(Filters.text,
                                       received_userpass,
                                       pass_user_data=True)],
