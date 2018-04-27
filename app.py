@@ -152,7 +152,7 @@ def received_start_time(bot, update, user_data):
         text += ':00'
     if re.match(r'^\d$', text):
         text = '0' + text + ':00'
-    if re.match(r'^\d\:00', text):
+    if re.match(r'^\d\:\d{2}', text):
         text = '0' + text
     user_data['edit'].append(text)
     if user_data['edit_mode'] == 'remove':
