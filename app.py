@@ -226,7 +226,7 @@ def main():
     updater = Updater('517255695:AAFSQ549HEYNGhDCT3iC2dLgst1w5YPLOOA')
 
     dp = updater.dispatcher
-    restart_command_handler = CommandHandler('restart', restart, pass_user_data=True)
+    restart_command_handler = CommandHandler('stop', restart, pass_user_data=True)
     dp.add_handler(restart_command_handler)
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
