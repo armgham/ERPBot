@@ -47,10 +47,8 @@ def main(user_data, bot, update):
                         tozih.append(line)
                         line = ''
                 zaman = re.search(p2, total_time)
-
-                user_data['scrp_info'].append(
-                    zaman.group('day') + '\t' + zaman.group('start') + '\t' + zaman.group('end') + '\t' + ' '.join(
-                        tozih) + '\t' + dars + '\t' + ostad)
+                if zaman is not None:
+                  user_data['scrp_info'].append(zaman.group('day') + '\t' + zaman.group('start') + '\t' + zaman.group('end') + '\t' + ' '.join(tozih) + '\t' + dars + '\t' + ostad)
 
             except Exception as e:
                 print(dars)
