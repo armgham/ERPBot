@@ -25,8 +25,12 @@ def main(user_data, bot, update):
             driver.find_element_by_class_name('refreshDash').click()
         elem = driver.find_element_by_partial_link_text('ورود به س')
         elem.click()
-
+        
+        
+        
         wait = WebDriverWait(driver, 10)
+        elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'ورود به س')))
+        elem.click()
         elem = wait.until(ec.presence_of_element_located((By.ID, 'iframe_040101')))
 
         driver.get(elem.get_property('src'))
