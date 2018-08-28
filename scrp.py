@@ -20,11 +20,9 @@ markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 def main(user_data, bot, update):
     driver = webdriver.PhantomJS()
     try:
-        driver.get("http://erp.guilan.ac.ir")
+        driver.get("http://erp.guilan.ac.ir/Dashboard.aspx")
         if 'erp.guilan.ac.ir/GoToDashboard.aspx' in driver.current_url:
             driver.find_element_by_class_name('refreshDash').click()
-        elem = driver.find_element_by_partial_link_text('ورود به س')
-        elem.click()
         
         
         
