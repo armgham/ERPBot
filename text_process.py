@@ -80,4 +80,4 @@ def main(user_data, bot, update):
     del user_data['first_info']
     if 'info' not in user_data:
         user_data['info'] = user_data['scrp_info']
-# main('950121230013')
+# main('950122680007')
