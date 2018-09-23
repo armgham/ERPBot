@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import text_process
 import time_table_file
 from telegram import ReplyKeyboardMarkup
+from time import sleep
 
 
 reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (username, password)'],
@@ -50,6 +51,7 @@ def main(user_data, bot, update):
         sel.select_by_index(len(sel.options) - 1)
         elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'انتخاب واحد')))
         elem.click()
+        sleep(2)
 
         time_column_index = -1
 
