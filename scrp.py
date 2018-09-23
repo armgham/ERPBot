@@ -60,7 +60,8 @@ def main(user_data, bot, update):
         
         user_data['first_info'] = []
         user_data['midterm'] = []
-        table = soup.find('table', class_='mxgrid ')
+        gt = soup.find(id='mxgrid_container')
+        table = gt.find('table', class_='mxgrid ')
         rows = table.find_all('tr')
         for row_index in range(len(rows)):
             parts_of_row = rows[row_index].find_all('td')
