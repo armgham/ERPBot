@@ -41,6 +41,34 @@ def main(user_data, bot, update):
         elem.click()
         elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'امور آموزش')))
         elem.click()
+        
+        elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'کارنامه ترم')))
+        elem.click()
+        elem = wait.until(ec.presence_of_element_located((By.ID, 'iframe_020205')))
+        driver.get(elem.get_property('src'))
+        sel = Select(wait.until(ec.presence_of_element_located((By.ID, 'Term_Drp'))))
+        sel.select_by_index(len(sel.options) - 1)
+        elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'انتخاب واحد')))
+        elem.click()
+
+        time_column_index = -1
+
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        driver.close()
+        
+        user_data['first_info'] = []
+        user_data['midterm'] = []
+        table = soup.find('table', class_='mxgrid ')
+        rows = table.find_all('tr')
+        for row_index in range(len(rows)):
+            parts_of_row = rows[row_index].find_all('td')
+            user_data['first_info'].append(
+                parts_of_row[time_column_index].text + '\t\t\t' + parts_of_row[1].text +
+                '\t\t(((' + parts_of_row[time_column_index - 1].text.replace('\n ', ''))
+        
+        
+        
+        '''
         elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'فرم تثب')))
         elem.click()
         elem = wait.until(ec.presence_of_element_located((By.ID, 'iframe_020203')))
@@ -81,6 +109,7 @@ def main(user_data, bot, update):
             parts_of_row = rows[row_index].find_all('td')
             user_data['exams'].append(parts_of_row[2].find('span').text + '   :   ' +
                                       parts_of_row[exams_time_column_index].find('span').text)
+        '''
         text_process.main(user_data, bot, update)
         time_table_file.main(user_data, bot, update, from_scrp=True)
         
