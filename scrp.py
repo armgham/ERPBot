@@ -60,6 +60,7 @@ def main(user_data, bot, update):
         
         user_data['first_info'] = []
         user_data['midterm'] = []
+        user_data['exams'] = []
         gt = soup.find(id='mxgrid_container')
         table = gt.find('table', class_='mxgrid ')
         rows = table.find_all('tr')
