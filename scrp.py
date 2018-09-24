@@ -51,7 +51,7 @@ def main(user_data, bot, update):
         sel.select_by_index(len(sel.options) - 1)
         elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'انتخاب واحد')))
         elem.click()
-        sleep(2)
+        sleep(4)
 
         time_column_index = -1
 
