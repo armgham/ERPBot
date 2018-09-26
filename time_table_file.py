@@ -106,7 +106,7 @@ def main(user_data, bot, update, from_scrp=False):
         plt.text((starts[i] + ends[i]) * 0.5,
                  (sorted_days.index(days[i]) + sorted_days.index(days[i]) + 2) * 0.5 + 0.23,
                  get_display(persian_reshaper.reshape(data[5])), ha='center', va='center', fontsize=8 - len(temp5))
-    '''
+    
     examsb = []
     for line in user_data['exams']:
         pattern = r'^.*(?P<y>\d{4})\/(?P<m>\d{2})\/(?P<d>\d{2}).*از ((?P<h>\d{2})\:\d{2}) تا.*$'
@@ -120,7 +120,7 @@ def main(user_data, bot, update, from_scrp=False):
     [exams[int(k.group('h')) / 24 + int(k.group('d')) + (int(k.group('m')) - 1) * 31 + (
             int(k.group('y')) - 1) * 31 * 12].append(k.group()) for k
      in examsb if k is not None]
-    '''
+    
     mtermsb = []
     for line in user_data['midterm']:
         pattern = r'^.*(?P<y>\d{4})\/(?P<m>\d{1,2})\/(?P<d>\d{1,2}).*$'
@@ -140,7 +140,6 @@ def main(user_data, bot, update, from_scrp=False):
     plt.text(exx + 0.5, (1 + 5.5 * len(sorted_days)) * 0.2, get_display(persian_reshaper.reshape(':پایانترم')),
              fontsize=13)
     
-    '''
     for key in sorted(exams):
         for j in exams[key]:
             if jj == 8:
@@ -149,7 +148,7 @@ def main(user_data, bot, update, from_scrp=False):
             plt.text(exx, (jj + 1.5 + 5.5 * len(sorted_days)) * 0.2, get_display(persian_reshaper.reshape(j)),
                      fontsize=11)
             jj += 1
-    '''
+    
     if from_scrp:
         mterms = []
     if not from_scrp:
