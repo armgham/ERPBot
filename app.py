@@ -229,7 +229,7 @@ def main():
     restart_command_handler = CommandHandler('stop', restart, pass_user_data=True)
     dp.add_handler(restart_command_handler)
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
+        entry_points=[CommandHandler('start', start), MessageHandler(Filters.text, start)],
 
         states={
             CHOOSING: [RegexHandler('^.*\(username\, password\)$',
