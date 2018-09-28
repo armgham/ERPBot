@@ -193,6 +193,7 @@ def main(user_data, bot, update, from_scrp=False):
                                                                     'rb'), reply_markup=markup)
 
     # plt.show()
+    time.sleep(5)
     os.remove('{0}.png'.format(user_data['username'] + 'barn'))
     os.remove('{0}.pdf'.format(user_data['username'] + 'barn'))
     plt.close()
