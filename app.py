@@ -238,6 +238,8 @@ def main():
                        RegexHandler('^گرفتن برنامه از erp$',
                                     time_table_scrp,
                                     pass_user_data=True),
+                       CommandHandler('start',
+                                      start),
                        RegexHandler('^ویرایش برنامه$',
                                     edit,
                                     pass_user_data=True),
