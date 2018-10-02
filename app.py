@@ -221,6 +221,10 @@ def restart(bot, update, user_data):
     user_data.clear()
     update.message.reply_text('اطلاعاتت پاک شد.', reply_markup=markup)
 
+def unknown(bot, update):
+    update.message.reply_text('ورودی یا دستور نامعتبر!', reply_markup=markup)
+    return CHOOSING
+
 
 def main():
     updater = Updater('517255695:AAFSQ549HEYNGhDCT3iC2dLgst1w5YPLOOA')
@@ -257,7 +261,9 @@ def main():
                                     pass_user_data=True),
                        CommandHandler('cancel',
                                       cancel_edit,
-                                      pass_user_data=True)],
+                                      pass_user_data=True),
+                       MessageHandler(Filters.all,
+                                      unknown)],
            
             CHOOSING_DARS: [MessageHandler(Filters.text,
                                            received_dars,
@@ -271,7 +277,9 @@ def main():
                                 pass_user_data=True),
                    CommandHandler('cancel',
                                   cancel_edit,
-                                  pass_user_data=True)
+                                  pass_user_data=True),
+                   MessageHandler(Filters.all,
+                                      unknown)
                    ],
             USERPASS: [MessageHandler(Filters.text,
                                       received_userpass,
@@ -285,7 +293,9 @@ def main():
                                       pass_user_data=True),
                          CommandHandler('cancel',
                                         cancel_edit,
-                                        pass_user_data=True)],
+                                        pass_user_data=True),
+                         MessageHandler(Filters.all,
+                                      unknown)],
 
             FINISH_TIME: [RegexHandler('^\d{1,2}$',
                                        received_finish_time,
@@ -295,7 +305,9 @@ def main():
                                        pass_user_data=True),
                           CommandHandler('cancel',
                                          cancel_edit,
-                                         pass_user_data=True)],
+                                         pass_user_data=True),
+                          MessageHandler(Filters.all,
+                                      unknown)],
 
             COMMENTS: [MessageHandler(Filters.text,
                                       received_comments,
