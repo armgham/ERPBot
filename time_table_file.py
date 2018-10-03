@@ -4,6 +4,7 @@ import re
 import time
 import telegram
 import matplotlib as mpl
+
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 from bidi.algorithm import get_display
@@ -69,15 +70,18 @@ def main(user_data, bot, update, from_scrp=False):
     fig = plt.figure(figsize=(16, 9))
     for i, line in zip(range(len(days)), data_of_time_table):
         data = line.split('\t')
+        this_start = float(data[1].split(':')[0]) + float(data[1].split(':')[1]) / 60
+        this_end = float(data[2].split(':')[0]) + float(data[2].split(':')[1]) / 60
         temp3 = []
-        if len(data[3]) > 30:
-            for iji in range(int(len(data[3]) / 32) + 1):
-                temp3.append(data[3][iji * 32:32 * (iji + 1)])
+        if len(data[3]) > 200 * (this_end - this_start) / (mx - mn):  # 300
+            for iji in range(int(len(data[3]) / (213 * (this_end - this_start) / (mx - mn))) + 1):  # 32
+                temp3.append(data[3][iji * int(213 * (this_end - this_start) / (mx - mn)):int(213 * (
+                            this_end - this_start) / (mx - mn)) * (iji + 1)])  # 32
             data[3] = '\n'.join(temp3)
         temp5 = []
-        if len(data[5]) > 32:
-            for ijl in range(int(len(data[5]) / 34) + 1):
-                temp5.append(data[5][ijl * 34:34 * (ijl + 1)])
+        if len(data[5]) > (213 * (this_end - this_start) / (mx - mn)):  # 32
+            for ijl in range(int(len(data[5]) / (226 * (this_end - this_start) / (mx - mn))) + 1):  # 34
+                temp5.append(data[5][ijl * int(226 * (this_end - this_start) / (mx - mn)):int(226 * (this_end - this_start) / (mx - mn)) * (ijl + 1)])  # 34
             data[5] = '\n'.join(temp5)
 
         plt.fill_between([starts[i] + 0.05, ends[i] - 0.05],
@@ -86,9 +90,9 @@ def main(user_data, bot, update, from_scrp=False):
                          color=colors[nl[get_display(persian_reshaper.reshape(data[4]))]], edgecolor='red', linewidth=5)
 
         temp4 = []
-        if len(data[4]) > 24:
-            for ijk in range(int(len(data[4]) / 27) + 1):
-                temp4.append(data[4][ijk * 27:27 * (ijk + 1)])
+        if len(data[4]) > (160 * (this_end - this_start) / (mx - mn)):  # 24
+            for ijk in range(int(len(data[4]) / (180 * (this_end - this_start) / (mx - mn))) + 1):  # 27
+                temp4.append(data[4][ijk * int(180 * (this_end - this_start) / (mx - mn)):int(180 * (this_end - this_start) / (mx - mn)) * (ijk + 1)])  # 27
             data[4] = '\n'.join(temp4)
 
         plt.text(starts[i] + 0.25, sorted_days.index(days[i]) + 0.55,
@@ -106,7 +110,7 @@ def main(user_data, bot, update, from_scrp=False):
         plt.text((starts[i] + ends[i]) * 0.5,
                  (sorted_days.index(days[i]) + sorted_days.index(days[i]) + 2) * 0.5 + 0.23,
                  get_display(persian_reshaper.reshape(data[5])), ha='center', va='center', fontsize=8 - len(temp5))
-    
+
     examsb = []
     for line in user_data['exams']:
         pattern = r'^.*(?P<y>\d{4})\/(?P<m>\d{2})\/(?P<d>\d{2}).*از ((?P<h>\d{2})\:\d{2}) تا.*$'
@@ -120,7 +124,7 @@ def main(user_data, bot, update, from_scrp=False):
     [exams[int(k.group('h')) / 24 + int(k.group('d')) + (int(k.group('m')) - 1) * 31 + (
             int(k.group('y')) - 1) * 31 * 12].append(k.group()) for k
      in examsb if k is not None]
-    
+
     mtermsb = []
     for line in user_data['midterm']:
         pattern = r'^.*(?P<y>\d{4})\/(?P<m>\d{1,2})\/(?P<d>\d{1,2}).*$'
@@ -139,7 +143,7 @@ def main(user_data, bot, update, from_scrp=False):
     exx = mx
     plt.text(exx + 0.5, (1 + 5.5 * len(sorted_days)) * 0.2, get_display(persian_reshaper.reshape(':پایانترم')),
              fontsize=13)
-    
+
     for key in sorted(exams):
         for j in exams[key]:
             if jj == 8:
@@ -148,7 +152,7 @@ def main(user_data, bot, update, from_scrp=False):
             plt.text(exx, (jj + 1.5 + 5.5 * len(sorted_days)) * 0.2, get_display(persian_reshaper.reshape(j)),
                      fontsize=11)
             jj += 1
-    
+
     if from_scrp:
         mterms = []
     if not from_scrp:
