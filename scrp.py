@@ -99,7 +99,7 @@ def main(user_data, bot, update):
             user_data['first_info'].append(
                 parts_of_row[time_column_index].find('span').text + '\t\t\t' + parts_of_row[2].find('span').text +
                 '\t\t(((' + parts_of_row[time_column_index - 1].find(
-                    'span').text.replace('\n ', ''))
+                    'span').text.replace('\n ', '').replace('\n', ''))
         exams_time_column_index = -1
         for column_index in range(len(rows[0].find_all('td'))):
             if rows[0].find_all('td')[column_index].find('span').text == 'زمان امتحان':
