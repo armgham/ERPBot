@@ -29,7 +29,7 @@ def ds(day):
         return 3
     elif day == get_display(persian_reshaper.reshape('چهارشنبه')):
         return 4
-    elif day == get_display(persian_reshaper.reshape('پنجشنبه')):
+    elif day == get_display(persian_reshaper.reshape('پنج شنبه')):
         return 5
     return -1
 
