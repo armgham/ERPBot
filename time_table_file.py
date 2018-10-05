@@ -90,7 +90,7 @@ def main(user_data, bot, update, from_scrp=False):
                          color=colors[nl[get_display(persian_reshaper.reshape(data[4]))]], edgecolor='red', linewidth=5)
 
         temp4 = []
-        if len(data[4]) > (160 * (this_end - this_start) / (mx - mn)):  # 24
+        if len(data[4]) > (150 * (this_end - this_start) / (mx - mn)):  # 24
             for ijk in range(int(len(data[4]) / (180 * (this_end - this_start) / (mx - mn))) + 1):  # 27
                 temp4.append(data[4][ijk * int(180 * (this_end - this_start) / (mx - mn)):int(180 * (this_end - this_start) / (mx - mn)) * (ijk + 1)])  # 27
             data[4] = '\n'.join(temp4)
