@@ -132,7 +132,7 @@ def day(bot, update, user_data):
     elif text == 'حذف یک بخش':
         user_data['edit_mode'] = 'remove'
     days_keyboard = [['شنبه', 'يکشنبه', 'دوشنبه'],
-                     ['سه شنبه', 'چهارشنبه', 'پنجشنبه']]
+                     ['سه شنبه', 'چهارشنبه', 'پنج شنبه']]
     days_markup = ReplyKeyboardMarkup(days_keyboard, one_time_keyboard=True)
     update.message.reply_text('چه روزی؟ :', reply_markup=days_markup)
     return CHOOSING
@@ -256,7 +256,7 @@ def main():
                        RegexHandler('^گرفتن برنامه ویرایش شده$',
                                     time_table,
                                     pass_user_data=True),
-                       RegexHandler('^(پنجشنبه|سه شنبه|دوشنبه|چهارشنبه|يکشنبه|شنبه)$',
+                       RegexHandler('^(پنج شنبه|سه شنبه|دوشنبه|چهارشنبه|يکشنبه|شنبه)$',
                                     start_time,
                                     pass_user_data=True),
                        CommandHandler('cancel',
