@@ -12,6 +12,7 @@ markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 def main(user_data, bot, update):
     user_data['scrp_info'] = []
     for line in user_data['first_info']:
+        line = line.replace('**', '')
         ostad = re.search(r'\t{2}\(\(\((?P<ostad>.*$)', line).group('ostad')
         dars = re.search(r'\t{3}(?P<dars>.*?)\t', line).group('dars')
         line = line[0:line.find('\t\t\t')]
