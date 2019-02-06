@@ -262,6 +262,9 @@ def main():
                        CommandHandler('cancel',
                                       cancel_edit,
                                       pass_user_data=True),
+                       CommandHandler('restart',
+                                      restart,
+                                      pass_user_data=True),
                        MessageHandler(Filters.all,
                                       unknown)],
            
