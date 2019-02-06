@@ -16,7 +16,7 @@ def main(user_data, bot, update):
         dars = re.search(r'\t{3}(?P<dars>.*?)\t', lines).group('dars')
         lines = lines[0:lines.find('\t\t\t')]
         lines = list(filter(lambda x: x != '', lines.split('**')))
-        p = r'(?P<first_comment>.*?)\s*(?P<day>چهارشنبه|سه شنبه|دوشنبه|يکشنبه|شنبه)\s*(?P<second_comment>.*?)\s*(?P<start>\d{2}\:\d{2})\s+\-\s+(?P<end>\d{2}\:\d{2})\s*(?P<last_comment>.*)'
+        p = r'(?P<first_comment>.*?)\s*(?P<day>چهارشنبه|سه شنبه|دوشنبه|يکشنبه|پنج شنبه|شنبه)\s*(?P<second_comment>.*?)\s*(?P<start>\d{2}\:\d{2})\s+\-\s+(?P<end>\d{2}\:\d{2})\s*(?P<last_comment>.*)'
         for line in lines:
             try:
                 res = re.search(p, line)
