@@ -29,7 +29,7 @@ def main(user_data, bot, update):
                 print(dars)
                 print(e.args)
                 print(user_data)
-                bot.send_message(chat_id=update.message.chat.id, text='درس ' + dars + ' : \"' + line + ' ' + ostad + ' \"' + 'یه مشکلی داره نتونستم بیارم تو برنامه. اگه خواستی مبتونی با '
+                bot.send_message(chat_id=update.message.chat.id, text='درس ' + dars + ' : \"' + line + ' ' + ostad + ' \"' + 'یه مشکلی داره نتونستم بیارم تو برنامه. اگه خواستی میتونی با '
                                                   'استفاده از (ویرایش برنامه) دستی یه بخش جدید به برنامه اضافه کنی',
                                  reply_markup=markup)
                 continue
