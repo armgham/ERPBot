@@ -116,15 +116,15 @@ def main(user_data, bot, update):
         print('selenium.common.exceptions.TimeoutException')
         print(user_data)
         bot.send_message(chat_id=update.message.chat_id,
-                         text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو درست '
-                              'بفرست اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
+                         text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
+                              'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
         driver.close()
     except Exception as e:
         print(e.args)
         print(user_data)
         bot.send_message(chat_id=update.message.chat_id,
-                         text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو درست '
-                              'بفرست اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
+                         text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
+                              'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
         try:
             driver.close()
         except Exception as e:
