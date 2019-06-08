@@ -14,9 +14,10 @@ os.system('wget https://github.com/mozilla/geckodriver/releases/download/v0.11.1
 os.system('tar -zxvf geckodriver-v0.11.1-linux64.tar.gz')
 os.system('wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2')
 os.system('tar xjf phantomjs-2.1.1-linux-x86_64.tar.bz2')
-path = '/opt/app-root/src/phantomjs-2.1.1-linux-x86_64/bin'
+cwd = os.getcwd()
+path = cwd + '/phantomjs-2.1.1-linux-x86_64/bin'
 os.environ["PATH"] += os.pathsep + path
-os.environ["PATH"] += os.pathsep + '/opt/app-root/src'
+os.environ["PATH"] += os.pathsep + cwd
 
 CHOOSING, TYPING_REPLY, TYPING_CHOICE, USERPASS, START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR, CHOOSING_DARS, DATE = range(11)
 
