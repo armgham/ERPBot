@@ -76,7 +76,7 @@ def main(user_data, bot, update):
         time_column_index = 11
 
         soup = BeautifulSoup(driver.page_source, 'html.parser')
-        driver.close()
+        driver.quit()
         rows = soup.find_all('table', class_='grd')
         del soup
         for column_index in range(len(rows[0].find_all('td'))):
@@ -119,7 +119,7 @@ def main(user_data, bot, update):
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
                               'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
         try:
-            driver.close()
+            driver.quit()
         except Exception as e:
             print(e.args)
             pass
@@ -130,7 +130,7 @@ def main(user_data, bot, update):
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
                               'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
         try:
-            driver.close()
+            driver.quit()
         except Exception as e:
             print(e.args)
             pass
