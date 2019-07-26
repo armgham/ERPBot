@@ -1,5 +1,5 @@
 python-telegram-bot
 selenium
-matplotlib
+matplotlib==3.0.1
 python-bidi
 beautifulsoup4
