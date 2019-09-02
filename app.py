@@ -252,7 +252,7 @@ def unknown(update, context):
 
 
 def main():
-    updater = Updater('984833584:AAF9SnPtDvjXmmSpk1ZdOn9NEu8x5nRbEO8', use_context=True)
+    updater = Updater('517255695:AAFSQ549HEYNGhDCT3iC2dLgst1w5YPLOOA', use_context=True)
 
     dp = updater.dispatcher
     restart_command_handler = CommandHandler('stop', restart, pass_user_data=True)
