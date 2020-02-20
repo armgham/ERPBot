@@ -7,17 +7,7 @@ import _thread
 import time_table_file
 import re
 import os
-
-
-os.system('wget https://github.com/mozilla/geckodriver/releases/download/v0.11.1/geckodriver-v0.11.1-linux64.tar.gz')
-os.system('tar -zxvf geckodriver-v0.11.1-linux64.tar.gz')
-os.system('wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2')
-os.system('tar xjf phantomjs-2.1.1-linux-x86_64.tar.bz2')
-cwd = os.getcwd()
-path = cwd + '/phantomjs-2.1.1-linux-x86_64/bin'
-os.environ["PATH"] += os.pathsep + path
-os.environ["PATH"] += os.pathsep + cwd
-
+import config
 
 CHOOSING, TYPING_REPLY, TYPING_CHOICE, USERPASS, START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR, CHOOSING_DARS, DATE = range(11)
 
@@ -252,7 +242,7 @@ def unknown(update, context):
 
 
 def main():
-    updater = Updater('984833584:AAF9SnPtDvjXmmSpk1ZdOn9NEu8x5nRbEO8', use_context=True)
+    updater = Updater(config.TOKEN, use_context=True)
 
     dp = updater.dispatcher
     restart_command_handler = CommandHandler('stop', restart, pass_user_data=True)
