@@ -64,7 +64,6 @@ def time_table_scrp(update, context):
         bot.send_message(chat_id=update.message.chat_id, text='خب {} خودتو بده:'.format('نام کاربری'))
         user_data['choice'] = 'username'
         return USERPASS
-
     _thread.start_new_thread(scrp.main, (user_data, bot, update))
     bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
     return CHOOSING
