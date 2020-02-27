@@ -9,3 +9,13 @@ RUN apt-get install python3-pip -y
 
 COPY ./requirements.txt /tmp/
 RUN pip3 install -r /tmp/requirements.txt
+<<<<<<< HEAD
+=======
+
+USER seluser
+
+COPY ./ERPBot /app
+ENTRYPOINT [ "python3" ]
+
+CMD ["/app/app.py"] 
+>>>>>>> 0232a8c8ba478511675f244aaa4e4b266fe3b608
