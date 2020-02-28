@@ -9,25 +9,16 @@ import re
 import os
 import config
 
+'''
 os.system('wget https://github.com/mozilla/geckodriver/releases/download/v0.11.1/geckodriver-v0.11.1-linux64.tar.gz')
-
 os.system('tar -zxvf geckodriver-v0.11.1-linux64.tar.gz')
-
 os.system('wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2')
-
 os.system('tar xjf phantomjs-2.1.1-linux-x86_64.tar.bz2')
-
 cwd = os.getcwd()
-
 path = cwd + '/phantomjs-2.1.1-linux-x86_64/bin'
-
 os.environ["PATH"] += os.pathsep + path
-
 os.environ["PATH"] += os.pathsep + cwd
-
-
-
-
+'''
 
 
 
