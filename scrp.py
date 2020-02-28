@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium import webdriver
+# from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from bs4 import BeautifulSoup
 import text_process
 import time_table_file
@@ -18,6 +19,12 @@ markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
 def main(user_data, bot, update):
+    '''
+    driver = webdriver.Remote(
+        command_executor='http://127.0.0.1:8910',
+        desired_capabilities=DesiredCapabilities.PHANTOMJS)
+    '''
+    
     driver = webdriver.PhantomJS()
     try:
         driver.get("http://sada.guilan.ac.ir/Dashboard.aspx")
