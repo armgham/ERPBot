@@ -18,7 +18,7 @@ RUN ln -sf /usr/local/share/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/loca
 COPY ./requirements.txt /tmp/
 RUN pip3 install -r /tmp/requirements.txt
 
-COPY ./ERPBot /
+COPY . /
 ENTRYPOINT [ "python3" ]
 
 #COPY x.py /app2.py
