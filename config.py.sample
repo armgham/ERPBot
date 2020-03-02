@@ -1,0 +1,9 @@
+# TOKEN OF TELEGRAM BOT
+TOKEN = 'token_string'
+
+# MySQL configs
+
+MYSQL_HOST = 'host'
+MYSQL_USERNAME = 'username'
+MYSQL_PASSWORD = 'pass'
+MYSQL_DB_NAME = 'db_name'
