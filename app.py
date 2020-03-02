@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 from telegram import ReplyKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
-                          ConversationHandler)
+                          ConversationHandler, PicklePersistence)
 import scrp
 import _thread
 import time_table_file
 import re
-import os
 import config
+import MySQLdb
+from SqlPersistence import SqlPersistence
 
 '''
+import os
 os.system('wget https://github.com/mozilla/geckodriver/releases/download/v0.11.1/geckodriver-v0.11.1-linux64.tar.gz')
 os.system('tar -zxvf geckodriver-v0.11.1-linux64.tar.gz')
 os.system('wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2')
@@ -20,9 +22,8 @@ os.environ["PATH"] += os.pathsep + path
 os.environ["PATH"] += os.pathsep + cwd
 '''
 
-
-
-CHOOSING, TYPING_REPLY, TYPING_CHOICE, USERPASS, START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR, CHOOSING_DARS, DATE = range(11)
+CHOOSING, TYPING_REPLY, TYPING_CHOICE, USERPASS, START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR, CHOOSING_DARS, DATE = range(
+    11)
 
 reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (username, password)'],
                   ['گرفتن برنامه از erp'],
@@ -124,8 +125,9 @@ def received_dars(update, context):
             user_data['midterm'].remove(user_data['midterm'][ind])
     user_data['edit'] = []
     user_data['edit'].append(dars)
-    update.message.reply_text('خب توضیحات (مثلا تا کجا امتحانه یا هر چیز دیگه ای) با آخرش هم تاریخ میانترم رو به شکل yyyy/mm/dd بفرست :\n'
-                              'مثلا: تا صفحه 72 فصل دو حذف : 1397/02/15')
+    update.message.reply_text(
+        'خب توضیحات (مثلا تا کجا امتحانه یا هر چیز دیگه ای) با آخرش هم تاریخ میانترم رو به شکل yyyy/mm/dd بفرست :\n'
+        'مثلا: تا صفحه 72 فصل دو حذف : 1397/02/15')
     return DATE
 
 
@@ -248,13 +250,21 @@ def restart(update, context):
     user_data.clear()
     update.message.reply_text('اطلاعاتت پاک شد.', reply_markup=markup)
 
+
 def unknown(update, context):
     update.message.reply_text('ورودی یا دستور نامعتبر!', reply_markup=markup)
     return CHOOSING
 
 
 def main():
-    updater = Updater(config.TOKEN, use_context=True)
+    # my_persistence = PicklePersistence('pfile', on_flush=True)
+    my_db = MySQLdb.connect(host=config.MYSQL_HOST,
+                            user=config.MYSQL_USERNAME,
+                            passwd=config.MYSQL_PASSWORD,
+                            db=config.MYSQL_DB_NAME,
+                            charset='utf8')
+    sp = SqlPersistence(my_db)
+    updater = Updater(config.TOKEN, persistence=sp, use_context=True)
 
     dp = updater.dispatcher
     restart_command_handler = CommandHandler('stop', restart, pass_user_data=True)
@@ -264,27 +274,27 @@ def main():
 
         states={
             CHOOSING: [MessageHandler(Filters.regex('^.*\(username\, password\)$'),
-                                    user_pass),
+                                      user_pass),
                        MessageHandler(Filters.regex('^گرفتن برنامه از erp$'),
-                                    time_table_scrp,
-                                    ),
+                                      time_table_scrp,
+                                      ),
                        CommandHandler('start',
                                       start),
                        MessageHandler(Filters.regex('^ویرایش برنامه$'),
-                                    edit,
-                                    ),
+                                      edit,
+                                      ),
                        MessageHandler(Filters.regex('^میانترم$'),
-                                    midterm,
-                                    ),
+                                      midterm,
+                                      ),
                        MessageHandler(Filters.regex('^(ایجاد بخش جدید|حذف یک بخش)$'),
-                                    day,
-                                    ),
+                                      day,
+                                      ),
                        MessageHandler(Filters.regex('^گرفتن برنامه ویرایش شده$'),
-                                    time_table,
-                                    ),
+                                      time_table,
+                                      ),
                        MessageHandler(Filters.regex('^(پنج شنبه|سه شنبه|دوشنبه|چهارشنبه|يکشنبه|شنبه)$'),
-                                    start_time,
-                                    ),
+                                      start_time,
+                                      ),
                        CommandHandler('cancel',
                                       cancel_edit,
                                       ),
@@ -293,7 +303,7 @@ def main():
                                       ),
                        MessageHandler(Filters.all,
                                       unknown)],
-           
+
             CHOOSING_DARS: [MessageHandler(Filters.text,
                                            received_dars,
                                            ),
@@ -302,41 +312,41 @@ def main():
                                            )
                             ],
             DATE: [MessageHandler(Filters.regex('.*\d{4}\/\d{1,2}\/\d{1,2}.*'),
-                                received_date,
-                                ),
+                                  received_date,
+                                  ),
                    CommandHandler('cancel',
                                   cancel_edit,
                                   ),
                    MessageHandler(Filters.all,
-                                      unknown)
+                                  unknown)
                    ],
             USERPASS: [MessageHandler(Filters.text,
                                       received_userpass,
                                       )],
 
             START_TIME: [MessageHandler(Filters.regex('^\d{1,2}$'),
-                                      received_start_time,
-                                      ),
+                                        received_start_time,
+                                        ),
                          MessageHandler(Filters.regex('^\d{1,2}\:\d{1,2}$'),
-                                      received_start_time,
-                                      ),
+                                        received_start_time,
+                                        ),
                          CommandHandler('cancel',
                                         cancel_edit,
                                         ),
                          MessageHandler(Filters.all,
-                                      unknown)],
+                                        unknown)],
 
             FINISH_TIME: [MessageHandler(Filters.regex('^\d{1,2}$'),
-                                       received_finish_time,
-                                       ),
+                                         received_finish_time,
+                                         ),
                           MessageHandler(Filters.regex('^\d{1,2}\:\d{1,2}$'),
-                                       received_finish_time,
-                                       ),
+                                         received_finish_time,
+                                         ),
                           CommandHandler('cancel',
                                          cancel_edit,
                                          ),
                           MessageHandler(Filters.all,
-                                      unknown)],
+                                         unknown)],
 
             COMMENTS: [MessageHandler(Filters.text,
                                       received_comments,
@@ -364,7 +374,10 @@ def main():
                                           )],
         },
 
-        fallbacks=[]
+        fallbacks=[],
+        # allow_reentry=True,
+        name="my_conversation",
+        persistent=True
     )
 
     dp.add_handler(conv_handler)
@@ -376,4 +389,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
