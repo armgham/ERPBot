@@ -43,7 +43,14 @@ def main(user_data, bot, update):
 
         elem = driver.find_element_by_name('SSMPassword_txt')
         elem.send_keys(user_data['password'] + Keys.ENTER)
+        try:
+            wait = WebDriverWait(driver, 0.01)
+            elem = wait.until(ec.presence_of_element_located((By.ID, 'userInfoTitle')))
+        except:
+            print('')
+        wait = WebDriverWait(driver, 10)
         elem = wait.until(ec.presence_of_element_located((By.ID, 'userInfoTitle')))
+
         elem.click()
         elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'امور آموزش')))
         elem.click()
