@@ -9,6 +9,9 @@ import re
 import config
 import MySQLdb
 from SqlPersistence import SqlPersistence
+import logging
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 '''
 import os
@@ -270,7 +273,7 @@ def main():
     restart_command_handler = CommandHandler('stop', restart, pass_user_data=True)
     dp.add_handler(restart_command_handler)
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start), MessageHandler(Filters.text, start)],
+        entry_points=[CommandHandler('start', start)],
 
         states={
             MAIN_CHOOSING: [MessageHandler(Filters.regex('^.*\(username\, password\)$'),
