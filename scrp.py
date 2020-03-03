@@ -43,6 +43,10 @@ def main(user_data, bot, update):
 
         elem = driver.find_element_by_name('SSMPassword_txt')
         elem.send_keys(user_data['password'] + Keys.ENTER)
+
+        elem = wait.until(ec.presence_of_element_located((By.ID, 'Default_URL_TAB_ID')))
+        elem = elem.find_element_by_class_name('close')
+        elem.click()
         try:
             wait = WebDriverWait(driver, 0.01)
             elem = wait.until(ec.presence_of_element_located((By.ID, 'userInfoTitle')))
@@ -80,7 +84,7 @@ def main(user_data, bot, update):
                 parts_of_row[time_column_index].text + '\t\t\t' + parts_of_row[1].text +
                 '\t\t(((' + parts_of_row[time_column_index - 1].text.replace('\n ', ''))
         '''
-        
+
         time_column_index = 11
         elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'فرم تثب')))
         elem.click()
