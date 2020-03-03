@@ -2,10 +2,9 @@ FROM centos:centos7
 
 RUN yum update -y
 
-RUN yum install -y glibc fontconfig freetype freetype-devel fontconfig-devel wget bzip2
+RUN yum install -y glibc fontconfig freetype freetype-devel fontconfig-devel wget bzip2 mysql-devel gcc
 
-RUN yum -y install python3
-RUN yum -y install python3-pip
+RUN yum -y install python3 python3-devel
 
 RUN yum clean all
 
