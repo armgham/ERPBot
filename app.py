@@ -10,7 +10,7 @@ import config
 import MySQLdb
 from SqlPersistence import SqlPersistence
 import logging
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.WARNING,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 '''
@@ -106,7 +106,7 @@ def edit(update, context):
     edit_markup = ReplyKeyboardMarkup(edit_keyboard, one_time_keyboard=True)
     update.message.reply_text('یکی رو انتخاب کن (اگه وسط راه پشیمون شدی میتونی /cancel رو بفرستی):',
                               reply_markup=edit_markup)
-    return MAIN_CHOOSING
+    return EDIT_CHOOSING
 
 
 def midterm(update, context):
@@ -156,7 +156,7 @@ def day(update, context):
                      ['سه شنبه', 'چهارشنبه', 'پنج شنبه']]
     days_markup = ReplyKeyboardMarkup(days_keyboard, one_time_keyboard=True)
     update.message.reply_text('چه روزی؟ :', reply_markup=days_markup)
-    return MAIN_CHOOSING
+    return DAY_CHOOSING
 
 
 def start_time(update, context):
@@ -235,19 +235,6 @@ def cancel_edit(update, context):
     return MAIN_CHOOSING
 
 
-def received_information(update, context):
-    user_data = context.user_data
-    text = update.message.text
-    print(text)
-    category = user_data['choice']
-    user_data[category] = text
-    del user_data['choice']
-
-    update.message.reply_text('sss',
-                              reply_markup=markup)
-    return MAIN_CHOOSING
-
-
 def restart(update, context):
     user_data = context.user_data
     user_data.clear()
@@ -276,9 +263,9 @@ def main():
         entry_points=[CommandHandler('start', start)],
 
         states={
-            MAIN_CHOOSING: [MessageHandler(Filters.regex('^.*\(username\, password\)$'),
+            MAIN_CHOOSING: [MessageHandler(Filters.regex(r'^.*\(username\, password\)$'),
                                       user_pass),
-                       MessageHandler(Filters.regex('^گرفتن برنامه از erp$'),
+                       MessageHandler(Filters.regex(r'^گرفتن برنامه از erp$'),
                                       time_table_scrp,
                                       ),
                        CommandHandler('start',
@@ -339,7 +326,7 @@ def main():
                             MessageHandler(Filters.all,
                                   unknown)],
                                   
-            DATE: [MessageHandler(Filters.regex('.*\d{4}\/\d{1,2}\/\d{1,2}.*'),
+            DATE: [MessageHandler(Filters.regex(r'.*\d{4}\/\d{1,2}\/\d{1,2}.*'),
                                   received_date,
                                   ),
                    CommandHandler('restart',
@@ -363,10 +350,10 @@ def main():
                        MessageHandler(Filters.all,
                                       unknown)],
 
-            START_TIME: [MessageHandler(Filters.regex('^\d{1,2}$'),
+            START_TIME: [MessageHandler(Filters.regex(r'^\d{1,2}$'),
                                         received_start_time,
                                         ),
-                         MessageHandler(Filters.regex('^\d{1,2}\:\d{1,2}$'),
+                         MessageHandler(Filters.regex(r'^\d{1,2}\:\d{1,2}$'),
                                         received_start_time,
                                         ),
                          CommandHandler('restart',
@@ -378,10 +365,10 @@ def main():
                          MessageHandler(Filters.all,
                                         unknown)],
 
-            FINISH_TIME: [MessageHandler(Filters.regex('^\d{1,2}$'),
+            FINISH_TIME: [MessageHandler(Filters.regex(r'^\d{1,2}$'),
                                          received_finish_time,
                                          ),
-                          MessageHandler(Filters.regex('^\d{1,2}\:\d{1,2}$'),
+                          MessageHandler(Filters.regex(r'^\d{1,2}\:\d{1,2}$'),
                                          received_finish_time,
                                          ),
                           CommandHandler('restart',
