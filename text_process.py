@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import re
 from telegram import ReplyKeyboardMarkup
-
+import logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger()
 
 reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (username, password)'],
                   ['گرفتن برنامه از erp'],
@@ -26,14 +29,14 @@ def main(user_data, bot, update):
                     res.group('day') + '\t' + res.group('start') + '\t' + res.group('end') + '\t' + ' '.join([res.group('first_comment'), res.group('second_comment'), res.group('last_comment')]) + '\t' + dars + '\t' + ostad)
 
             except Exception as e:
-                print(dars)
-                print(e.args)
-                print(user_data)
+                logger.info(dars)
+                logger.info(str(e.args))
+                logger.info(str(user_data))
                 bot.send_message(chat_id=update.message.chat.id, text='درس ' + dars + ' : \"' + line + ' ' + ostad + ' \"' + 'یه مشکلی داره نتونستم بیارم تو برنامه. اگه خواستی میتونی با '
                                                   'استفاده از (ویرایش برنامه) دستی یه بخش جدید به برنامه اضافه کنی',
                                  reply_markup=markup)
                 continue
-    print(110)
+    logger.info('110')
     del user_data['first_info']
     if 'info' not in user_data:
         user_data['info'] = user_data['scrp_info']

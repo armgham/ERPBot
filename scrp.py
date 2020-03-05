@@ -6,11 +6,15 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium import webdriver
 # from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from time import sleep
 from bs4 import BeautifulSoup
 import text_process
 import time_table_file
 from telegram import ReplyKeyboardMarkup
-
+import logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger()
 
 reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (username, password)'],
                   ['گرفتن برنامه از erp'],
@@ -33,7 +37,8 @@ def main(user_data, bot, update):
         
         
         wait = WebDriverWait(driver, 10)
-        elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'ورود به س')))
+        # elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'ورود به س')))
+        elem = wait.until(ec.presence_of_element_located((By.CLASS_NAME, 'title')))
         elem.click()
         elem = wait.until(ec.presence_of_element_located((By.ID, 'iframe_040101')))
 
@@ -43,7 +48,8 @@ def main(user_data, bot, update):
 
         elem = driver.find_element_by_name('SSMPassword_txt')
         elem.send_keys(user_data['password'] + Keys.ENTER)
-
+        
+        sleep(1.2)
         elem = wait.until(ec.presence_of_element_located((By.ID, 'Default_URL_TAB_ID')))
         elem = elem.find_element_by_class_name('close')
         elem.click()
@@ -56,7 +62,8 @@ def main(user_data, bot, update):
         elem = wait.until(ec.presence_of_element_located((By.ID, 'userInfoTitle')))
 
         elem.click()
-        elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'امور آموزش')))
+        # elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'امور آموزش')))
+        elem = wait.until(ec.presence_of_element_located((By.XPATH, '//*[@onclick="onMenuItemClick(this,\'0202\',\'None\');"]')))
         elem.click()
         
         '''
@@ -86,7 +93,8 @@ def main(user_data, bot, update):
         '''
 
         time_column_index = 11
-        elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'فرم تثب')))
+        # elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'فرم تثب')))
+        elem = wait.until(ec.presence_of_element_located((By.XPATH, '//*[@onclick="onMenuItemClick(this,\'020203\',\'Tab\');"]')))
         elem.click()
         elem = wait.until(ec.presence_of_element_located((By.ID, 'iframe_020203')))
         driver.get(elem.get_property('src'))
@@ -130,24 +138,27 @@ def main(user_data, bot, update):
         time_table_file.main(user_data, bot, update, from_scrp=True)
         
     except selenium.common.exceptions.TimeoutException:
-        print('selenium.common.exceptions.TimeoutException')
-        print(user_data)
+        
         bot.send_message(chat_id=update.message.chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
                               'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
+        logging.info('selenium.common.exceptions.TimeoutException')
         try:
             driver.quit()
+            logging.info(str(user_data))
         except Exception as e:
-            print(e.args)
+            logging.warning(str(e.args))
             pass
     except Exception as e:
-        print(e.args)
-        print(user_data)
+        
         bot.send_message(chat_id=update.message.chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
                               'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
+        logging.warning(str(e.args))
+        
         try:
             driver.quit()
+            logging.info(str(user_data))
         except Exception as e:
-            print(e.args)
+            logging.info(str(e.args))
             pass

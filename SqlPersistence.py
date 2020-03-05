@@ -114,3 +114,4 @@ class SqlPersistence(BasePersistence):
 
 
         self.db.close()
+        print('done')

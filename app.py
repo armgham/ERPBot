@@ -10,7 +10,7 @@ import config
 import MySQLdb
 from SqlPersistence import SqlPersistence
 import logging
-logging.basicConfig(level=logging.WARNING,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 '''
