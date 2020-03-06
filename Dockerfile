@@ -20,6 +20,6 @@ RUN pip3 install -r /tmp/requirements.txt
 COPY . /
 ENTRYPOINT [ "python3" ]
 
-#COPY x.py /app2.py
+COPY x.py /app2.py
 
 CMD ["/app.py"] 

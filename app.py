@@ -12,7 +12,7 @@ from SqlPersistence import SqlPersistence
 import logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
+logging.getLogger().info('hi.')
 '''
 import os
 os.system('wget https://github.com/mozilla/geckodriver/releases/download/v0.11.1/geckodriver-v0.11.1-linux64.tar.gz')

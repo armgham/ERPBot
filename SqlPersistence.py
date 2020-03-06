@@ -2,6 +2,10 @@ from telegram.ext import BasePersistence
 
 from collections import defaultdict
 import json
+import logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger()
 
 
 class SqlPersistence(BasePersistence):
@@ -51,7 +55,7 @@ class SqlPersistence(BasePersistence):
         self.user_data[user_id] = data
 
     def update_chat_data(self, chat_id, data):
-        print(self.chat_data)
+        self.chat_data[chat_id] = data
 
     def update_conversation(self, name, key, new_state):
         if self.conversations.setdefault(name, {}).get(key) == new_state:
@@ -64,7 +68,7 @@ class SqlPersistence(BasePersistence):
         cur.execute('DROP TABLE IF EXISTS USER_DATA;')
         cur.execute('CREATE TABLE USER_DATA (user_id INT, data VARCHAR(10000));')
         self.db.commit()
-        print('in flush')
+        logger.info('in flush')
         counter = 0
         for user_id, defaultdict_data in self.user_data.items():
             data = json.dumps(defaultdict_data)
@@ -114,4 +118,4 @@ class SqlPersistence(BasePersistence):
 
 
         self.db.close()
-        print('done')
+        logger.info('done')

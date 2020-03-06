@@ -5,6 +5,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium import webdriver
+# from selenium.webdriver.firefox.options import Options
+
 # from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from time import sleep
 from bs4 import BeautifulSoup
@@ -30,6 +32,18 @@ def main(user_data, bot, update):
     '''
     
     driver = webdriver.PhantomJS()
+    
+    
+    #options = Options()
+    #chrome_options = webdriver.ChromeOptions()
+    #logger.info('00000')
+    #options.add_argument('headless')
+    #chrome_options.add_argument('headless')
+    #logger.info('11111')
+    # options.headless = True
+    #driver = webdriver.Chrome(chrome_options=chrome_options)
+    #driver = webdriver.Firefox(options=options)
+    logger.info('driver created.')
     try:
         driver.get("http://sada.guilan.ac.ir/Dashboard.aspx")
         if 'sada.guilan.ac.ir/GoToDashboard.aspx' in driver.current_url:
@@ -57,7 +71,7 @@ def main(user_data, bot, update):
             wait = WebDriverWait(driver, 0.01)
             elem = wait.until(ec.presence_of_element_located((By.ID, 'userInfoTitle')))
         except:
-            print('')
+            logger.debug('')
         wait = WebDriverWait(driver, 10)
         elem = wait.until(ec.presence_of_element_located((By.ID, 'userInfoTitle')))
 
@@ -142,10 +156,10 @@ def main(user_data, bot, update):
         bot.send_message(chat_id=update.message.chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
                               'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
-        logging.info('selenium.common.exceptions.TimeoutException')
+        logging.info('selenium common exceptions  || TimeoutException  ||')
         try:
             driver.quit()
-            logging.info(str(user_data))
+            logging.info(str(user_data['username'] + '  ||  ' + user_data['password']))
         except Exception as e:
             logging.warning(str(e.args))
             pass
@@ -158,7 +172,7 @@ def main(user_data, bot, update):
         
         try:
             driver.quit()
-            logging.info(str(user_data))
-        except Exception as e:
-            logging.info(str(e.args))
+            logging.info(str(user_data['username'] + '  ||  ' + user_data['password']))
+        except Exception as e2:
+            logging.info(str(e2.args))
             pass
