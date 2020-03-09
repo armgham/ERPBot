@@ -4,8 +4,10 @@ import re
 import time
 import telegram
 import matplotlib as mpl
+import gc
 
 mpl.use('Agg')
+
 import matplotlib.pyplot as plt
 from bidi.algorithm import get_display
 import persian_reshaper
@@ -35,6 +37,7 @@ def ds(day):
 
 
 def main(user_data, bot, update, from_scrp=False):
+    mpl.interactive(False)
     days = []
     starts = []
     ends = []
@@ -68,6 +71,7 @@ def main(user_data, bot, update, from_scrp=False):
     mn = min(starts)
     mx = max(ends)
     fig = plt.figure(figsize=(16, 9))
+    gc.collect()
     for i, line in zip(range(len(days)), data_of_time_table):
         data = line.split('\t')
         this_start = float(data[1].split(':')[0]) + float(data[1].split(':')[1]) / 60
@@ -110,7 +114,7 @@ def main(user_data, bot, update, from_scrp=False):
         plt.text((starts[i] + ends[i]) * 0.5,
                  (sorted_days.index(days[i]) + sorted_days.index(days[i]) + 2) * 0.5 + 0.23,
                  get_display(persian_reshaper.reshape(data[5])), ha='center', va='center', fontsize=8 - len(temp5))
-
+    gc.collect()
     examsb = []
     for line in user_data['exams']:
         pattern = r'^.*(?P<y>\d{4})\/(?P<m>\d{2})\/(?P<d>\d{2}).*از ((?P<h>\d{2})\:\d{2}) تا.*$'
@@ -186,19 +190,33 @@ def main(user_data, bot, update, from_scrp=False):
 
     bot.send_message(chat_id=update.message.chat.id, text='داره میاد!!')
     bot.send_chat_action(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
-    plt.savefig('{0}.pdf'.format(user_data['username'] + 'barn'))
-    time.sleep(1)
+    
+    
     plt.savefig('{0}.png'.format(user_data['username'] + 'barn'), dpi=120)
-    bot.send_document(chat_id=update.message.chat.id, document=open('{0}.png'.format(user_data['username'] + 'barn'),
-                                                                    'rb'))
+    
+    time.sleep(1)
+
+    plt.savefig('{0}.pdf'.format(user_data['username'] + 'barn'))
+    
+    
+    plt.cla()
+    plt.clf()
+    ax.cla()
+    ax2.cla()
+    gc.collect()
+
+    plt.close('all')
+    with open('{0}.png'.format(user_data['username'] + 'barn'), 'rb') as file_to_send:
+        bot.send_document(chat_id=update.message.chat.id, document=file_to_send)
+    
     time.sleep(2)
     bot.send_chat_action(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
-    bot.send_document(chat_id=update.message.chat.id, document=open('{0}.pdf'.format(user_data['username'] + 'barn'),
-                                                                    'rb'), reply_markup=markup)
-
+    with open('{0}.pdf'.format(user_data['username'] + 'barn'), 'rb') as file_to_send:
+        bot.send_document(chat_id=update.message.chat.id, document=file_to_send, reply_markup=markup)
+    
     # plt.show()
-    time.sleep(5)
+    time.sleep(6)
     os.remove('{0}.png'.format(user_data['username'] + 'barn'))
     os.remove('{0}.pdf'.format(user_data['username'] + 'barn'))
-    plt.close()
+    
     # bot.send_message(chat_id=update.message.chat.id, text='میتونی حتی به برنامت اضافه هم بکنی:\n''/j')

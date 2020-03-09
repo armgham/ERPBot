@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import multiprocessing as mp
 import selenium.common.exceptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -13,6 +14,8 @@ from bs4 import BeautifulSoup
 import text_process
 import time_table_file
 from telegram import ReplyKeyboardMarkup
+
+import gc
 import logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -107,6 +110,7 @@ def main(user_data, bot, update):
         '''
 
         time_column_index = 11
+        gc.collect()
         # elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'فرم تثب')))
         elem = wait.until(ec.presence_of_element_located((By.XPATH, '//*[@onclick="onMenuItemClick(this,\'020203\',\'Tab\');"]')))
         elem.click()
@@ -130,6 +134,7 @@ def main(user_data, bot, update):
 
             except ValueError:
                 break
+        gc.collect()
         rows = rows[0:number_of_rows + 1]
         user_data['first_info'] = []
         user_data['midterm'] = []
@@ -149,7 +154,13 @@ def main(user_data, bot, update):
             user_data['exams'].append(parts_of_row[2].find('span').text + '   :   ' +
                                       parts_of_row[exams_time_column_index].find('span').text)
         text_process.main(user_data, bot, update)
-        time_table_file.main(user_data, bot, update, from_scrp=True)
+        gc.collect()
+        pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update, True))
+        pr.daemon = True
+        pr.start()
+        pr.join()
+
+        # time_table_file.main(user_data, bot, update, from_scrp=True)
         
     except selenium.common.exceptions.TimeoutException:
         

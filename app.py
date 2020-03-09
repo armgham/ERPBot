@@ -6,15 +6,17 @@ import scrp
 import _thread
 import time_table_file
 import re
+import gc
 import config
 import MySQLdb
+import multiprocessing as mp
 from SqlPersistence import SqlPersistence
 import logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logging.getLogger().info('hi.')
 '''
-import os
+import os 47
 os.system('wget https://github.com/mozilla/geckodriver/releases/download/v0.11.1/geckodriver-v0.11.1-linux64.tar.gz')
 os.system('tar -zxvf geckodriver-v0.11.1-linux64.tar.gz')
 os.system('wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2')
@@ -25,6 +27,7 @@ os.environ["PATH"] += os.pathsep + path
 os.environ["PATH"] += os.pathsep + cwd
 '''
 
+#gc.set_threshold(1)
 MAIN_CHOOSING, DAY_CHOOSING, EDIT_CHOOSING, TYPING_CHOICE, USERPASS, START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR, CHOOSING_DARS, DATE = range(
     12)
 
@@ -92,7 +95,10 @@ def time_table(update, context):
     if 'exams' not in user_data:
         update.message.reply_text('اول برنامتو از erp بگیر بعد!', reply_markup=markup)
         return MAIN_CHOOSING
-    _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
+    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update))
+    pr.daemon = True
+    pr.start()
+    # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
     return MAIN_CHOOSING
 
 
@@ -141,7 +147,10 @@ def received_date(update, context):
     user_data['edit'].append(date)
     user_data['midterm'].append('  : '.join(user_data['edit']))
     del user_data['edit']
-    _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
+    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update))
+    pr.daemon = True
+    pr.start()
+    # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
     return MAIN_CHOOSING
 
 
@@ -185,7 +194,11 @@ def received_start_time(update, context):
             if str_parts[0] == user_data['edit'][0] and str_parts[1] == user_data['edit'][1]:
                 user_data['info'].remove(str_part_time_table)
         del user_data['edit']
-        _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
+
+        pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update))
+        pr.daemon = True
+        pr.start()
+        # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
         return MAIN_CHOOSING
     update.message.reply_text('ساعت پایان؟ (مثلا 13:30) :')
     return FINISH_TIME
@@ -224,14 +237,19 @@ def received_professor(update, context):
     user_data['edit'].append(text)
     user_data['info'].append('\t'.join(user_data['edit']))
     del user_data['edit']
-    _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
+
+    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update))
+    pr.daemon = True
+    pr.start()
+    # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
     return MAIN_CHOOSING
 
 
 def cancel_edit(update, context):
     user_data = context.user_data
     update.message.reply_text('کنسل شد!', reply_markup=markup)
-    del user_data['edit']
+    if 'edit' in user_data:
+        del user_data['edit']
     return MAIN_CHOOSING
 
 
@@ -259,6 +277,10 @@ def main():
     dp = updater.dispatcher
     restart_command_handler = CommandHandler('stop', restart, pass_user_data=True)
     dp.add_handler(restart_command_handler)
+    
+    #flush_command_handler = CommandHandler('flush', flush_database)
+    #dp.add_handler(flush_command_handler)
+
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
 
@@ -428,7 +450,6 @@ def main():
     updater.start_polling()
 
     updater.idle()
-
 
 if __name__ == '__main__':
     main()
