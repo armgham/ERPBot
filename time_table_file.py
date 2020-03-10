@@ -206,6 +206,7 @@ def main(user_data, bot, update, from_scrp=False):
     gc.collect()
 
     plt.close('all')
+    time.sleep(0.5)
     with open('{0}.png'.format(user_data['username'] + 'barn'), 'rb') as file_to_send:
         bot.send_document(chat_id=update.message.chat.id, document=file_to_send)
     
@@ -215,7 +216,7 @@ def main(user_data, bot, update, from_scrp=False):
         bot.send_document(chat_id=update.message.chat.id, document=file_to_send, reply_markup=markup)
     
     # plt.show()
-    time.sleep(6)
+    time.sleep(2.5)
     os.remove('{0}.png'.format(user_data['username'] + 'barn'))
     os.remove('{0}.pdf'.format(user_data['username'] + 'barn'))
     
