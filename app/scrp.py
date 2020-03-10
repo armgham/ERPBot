@@ -27,7 +27,7 @@ reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (use
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
-def main(user_data, bot, update):
+def main(user_data, bot, chat_id):
     '''
     driver = webdriver.Remote(
         command_executor='http://127.0.0.1:8910',
@@ -153,9 +153,9 @@ def main(user_data, bot, update):
             parts_of_row = rows[row_index].find_all('td')
             user_data['exams'].append(parts_of_row[2].find('span').text + '   :   ' +
                                       parts_of_row[exams_time_column_index].find('span').text)
-        text_process.main(user_data, bot, update)
+        text_process.main(user_data, bot, chat_id)
         gc.collect()
-        pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update, True))
+        pr = mp.Process(target=time_table_file.main, args=(user_data, bot, chat_id, True))
         pr.daemon = True
         pr.start()
         pr.join()
@@ -164,7 +164,7 @@ def main(user_data, bot, update):
         
     except selenium.common.exceptions.TimeoutException:
         
-        bot.send_message(chat_id=update.message.chat_id,
+        bot.send_message(chat_id=chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
                               'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
         logging.info('selenium common exceptions  || TimeoutException  ||')
@@ -176,7 +176,7 @@ def main(user_data, bot, update):
             pass
     except Exception as e:
         
-        bot.send_message(chat_id=update.message.chat_id,
+        bot.send_message(chat_id=chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
                               'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
         logging.warning(str(e.args))

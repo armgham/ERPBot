@@ -12,7 +12,7 @@ reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (use
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
-def main(user_data, bot, update):
+def main(user_data, bot, chat_id):
     user_data['scrp_info'] = []
     for lines in user_data['first_info']:
         ostad = re.search(r'\t{2}\(\(\((?P<ostad>.*$)', lines).group('ostad')
@@ -32,7 +32,7 @@ def main(user_data, bot, update):
                 logger.info(dars)
                 logger.info(str(e.args))
                 logger.info(str(user_data))
-                bot.send_message(chat_id=update.message.chat.id, text='درس ' + dars + ' : \"' + line + ' ' + ostad + ' \"' + 'یه مشکلی داره نتونستم بیارم تو برنامه. اگه خواستی میتونی با '
+                bot.send_message(chat_id=chat_id, text='درس ' + dars + ' : \"' + line + ' ' + ostad + ' \"' + 'یه مشکلی داره نتونستم بیارم تو برنامه. اگه خواستی میتونی با '
                                                   'استفاده از (ویرایش برنامه) دستی یه بخش جدید به برنامه اضافه کنی',
                                  reply_markup=markup)
                 continue

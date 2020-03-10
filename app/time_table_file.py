@@ -10,7 +10,7 @@ mpl.use('Agg')
 
 import matplotlib.pyplot as plt
 from bidi.algorithm import get_display
-import persian_reshaper
+from fonts import persian_reshaper
 import matplotlib.font_manager as fm
 from telegram import ReplyKeyboardMarkup
 
@@ -36,7 +36,7 @@ def ds(day):
     return -1
 
 
-def main(user_data, bot, update, from_scrp=False):
+def main(user_data, bot, chat_id, from_scrp=False):
     mpl.interactive(False)
     days = []
     starts = []
@@ -60,7 +60,7 @@ def main(user_data, bot, update, from_scrp=False):
             coms.append(get_display(persian_reshaper.reshape(data[3])))
         darss.append(get_display(persian_reshaper.reshape(data[4])))
     days2 = set(days)
-    prop = fm.FontProperties(fname='XP ZibaBd.ttf')
+    prop = fm.FontProperties(fname=os.path.abspath('app/fonts/XP_ZibaBd.ttf'))
     dd = dict((ds(x), x) for x in days2)
     sorted_days = []
     for key in sorted(dd):
@@ -188,8 +188,8 @@ def main(user_data, bot, update, from_scrp=False):
     ax2.set_yticklabels(sorted_days, fontsize=13)
     plt.subplots_adjust(left=0.06, bottom=0.26, right=0.95, top=0.96, wspace=0.2, hspace=0.2)
 
-    bot.send_message(chat_id=update.message.chat.id, text='داره میاد!!')
-    bot.send_chat_action(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
+    bot.send_message(chat_id=chat_id, text='داره میاد!!')
+    bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
     
     
     plt.savefig('{0}.png'.format(user_data['username'] + 'barn'), dpi=120)
@@ -208,12 +208,12 @@ def main(user_data, bot, update, from_scrp=False):
     plt.close('all')
     time.sleep(0.5)
     with open('{0}.png'.format(user_data['username'] + 'barn'), 'rb') as file_to_send:
-        bot.send_document(chat_id=update.message.chat.id, document=file_to_send)
+        bot.send_document(chat_id=chat_id, document=file_to_send)
     
     time.sleep(2)
-    bot.send_chat_action(chat_id=update.message.chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
+    bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
     with open('{0}.pdf'.format(user_data['username'] + 'barn'), 'rb') as file_to_send:
-        bot.send_document(chat_id=update.message.chat.id, document=file_to_send, reply_markup=markup)
+        bot.send_document(chat_id=chat_id, document=file_to_send, reply_markup=markup)
     
     # plt.show()
     time.sleep(2.5)

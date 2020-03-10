@@ -10,6 +10,6 @@ create table CONVERSATIONS (conversation_name VARCHAR(50));
 
 - [ ] flush command handler
 - [ ] fix bugs! (when press get the edited table first time, ...)
-- [ ] write a method return the bot object to other files can send_message ...
-- [ ] make phantomjs lighter and faster
+- [x] make phantomjs lighter and faster
+- [ ] callbackquery >_0
 

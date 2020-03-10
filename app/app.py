@@ -28,8 +28,8 @@ os.environ["PATH"] += os.pathsep + cwd
 '''
 
 #gc.set_threshold(1)
-MAIN_CHOOSING, DAY_CHOOSING, EDIT_CHOOSING, TYPING_CHOICE, USERPASS, START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR, CHOOSING_DARS, DATE = range(
-    12)
+MAIN_CHOOSING, DAY_CHOOSING, EDIT_CHOOSING, USERPASS, \
+    START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR, CHOOSING_DARS, DATE = range(11)
 
 reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (username, password)'],
                   ['گرفتن برنامه از erp'],
@@ -66,7 +66,7 @@ def received_userpass(update, context):
     del user_data['choice']
     if 'time_table' in user_data:
         update.message.reply_text('خب الان برنامه رو از erp میگیرم!')
-        _thread.start_new_thread(scrp.main, (user_data, bot, update))
+        _thread.start_new_thread(scrp.main, (user_data, bot, update.message.chat_id))
         del user_data['time_table']
         bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
         return MAIN_CHOOSING
@@ -84,7 +84,7 @@ def time_table_scrp(update, context):
         bot.send_message(chat_id=update.message.chat_id, text='خب {} خودتو بده:'.format('نام کاربری'))
         user_data['choice'] = 'username'
         return USERPASS
-    _thread.start_new_thread(scrp.main, (user_data, bot, update))
+    _thread.start_new_thread(scrp.main, (user_data, bot, update.message.chat_id))
     bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
     return MAIN_CHOOSING
 
@@ -95,7 +95,7 @@ def time_table(update, context):
     if 'exams' not in user_data:
         update.message.reply_text('اول برنامتو از erp بگیر بعد!', reply_markup=markup)
         return MAIN_CHOOSING
-    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update))
+    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update.message.chat_id))
     pr.daemon = True
     pr.start()
     # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
@@ -147,7 +147,7 @@ def received_date(update, context):
     user_data['edit'].append(date)
     user_data['midterm'].append('  : '.join(user_data['edit']))
     del user_data['edit']
-    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update))
+    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update.message.chat_id))
     pr.daemon = True
     pr.start()
     # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
@@ -195,7 +195,7 @@ def received_start_time(update, context):
                 user_data['info'].remove(str_part_time_table)
         del user_data['edit']
 
-        pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update))
+        pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update.message.chat_id))
         pr.daemon = True
         pr.start()
         # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
@@ -238,7 +238,7 @@ def received_professor(update, context):
     user_data['info'].append('\t'.join(user_data['edit']))
     del user_data['edit']
 
-    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update))
+    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update.message.chat_id))
     pr.daemon = True
     pr.start()
     # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
@@ -285,158 +285,89 @@ def main():
         entry_points=[CommandHandler('start', start)],
 
         states={
-            MAIN_CHOOSING: [MessageHandler(Filters.regex(r'^.*\(username\, password\)$'),
-                                      user_pass),
-                       MessageHandler(Filters.regex(r'^گرفتن برنامه از erp$'),
-                                      time_table_scrp,
-                                      ),
-                       CommandHandler('start',
-                                      start),
-                       MessageHandler(Filters.regex('^ویرایش برنامه$'),
-                                      edit,
-                                      ),
-                       MessageHandler(Filters.regex('^گرفتن برنامه ویرایش شده$'),
-                                      time_table,
-                                      ),
-                       CommandHandler('cancel',
-                                      cancel_edit,
-                                      ),
-                       CommandHandler('restart',
-                                      restart,
-                                      ),
-                       MessageHandler(Filters.all,
-                                      unknown)],
-            
+            MAIN_CHOOSING: [
+                MessageHandler(Filters.regex(r'^.*\(username\, password\)$'), user_pass),
+                MessageHandler(Filters.regex(r'^گرفتن برنامه از erp$'), time_table_scrp),
+                CommandHandler('start', start),
+                MessageHandler(Filters.regex('^ویرایش برنامه$'), edit),
+                MessageHandler(Filters.regex('^گرفتن برنامه ویرایش شده$'), time_table),
+                CommandHandler('cancel', cancel_edit),
+                CommandHandler('restart', restart),
+                MessageHandler(Filters.all, unknown),
+            ],
+    
             DAY_CHOOSING: [
-                       MessageHandler(Filters.regex('^(پنج شنبه|سه شنبه|دوشنبه|چهارشنبه|يکشنبه|شنبه)$'),
-                                      start_time,
-                                      ),
-                       CommandHandler('cancel',
-                                      cancel_edit,
-                                      ),
-                       CommandHandler('restart',
-                                      restart,
-                                      ),
-                       MessageHandler(Filters.all,
-                                      unknown)],
+                MessageHandler(Filters.regex('^(پنج شنبه|سه شنبه|دوشنبه|چهارشنبه|يکشنبه|شنبه)$'), start_time),
+                CommandHandler('cancel', cancel_edit),
+                CommandHandler('restart', restart),
+                MessageHandler(Filters.all, unknown),
+            ],
 
             EDIT_CHOOSING: [
-                       MessageHandler(Filters.regex('^میانترم$'),
-                                      midterm,
-                                      ),
-                       MessageHandler(Filters.regex('^(ایجاد بخش جدید|حذف یک بخش)$'),
-                                      day,
-                                      ),           
-                       CommandHandler('cancel',
-                                      cancel_edit,
-                                      ),
-                       CommandHandler('restart',
-                                      restart,
-                                      ),
-                       MessageHandler(Filters.all,
-                                      unknown)],
+                MessageHandler(Filters.regex('^میانترم$'), midterm),
+                MessageHandler(Filters.regex('^(ایجاد بخش جدید|حذف یک بخش)$'), day),           
+                CommandHandler('cancel', cancel_edit),
+                CommandHandler('restart', restart),
+                MessageHandler(Filters.all, unknown),
+            ],
 
-            CHOOSING_DARS: [MessageHandler(Filters.text,
-                                           received_dars,
-                                           ),
-                            CommandHandler('restart',
-                                      restart,
-                                      ),
-                            CommandHandler('cancel',
-                                           cancel_edit,
-                                           ),
-                            MessageHandler(Filters.all,
-                                  unknown)],
+            CHOOSING_DARS: [
+                MessageHandler(Filters.text, received_dars),
+                CommandHandler('restart', restart),
+                CommandHandler('cancel', cancel_edit),
+                MessageHandler(Filters.all, unknown),
+            ],
                                   
-            DATE: [MessageHandler(Filters.regex(r'.*\d{4}\/\d{1,2}\/\d{1,2}.*'),
-                                  received_date,
-                                  ),
-                   CommandHandler('restart',
-                                      restart,
-                                      ),
-                   CommandHandler('cancel',
-                                  cancel_edit,
-                                  ),
-                   MessageHandler(Filters.all,
-                                  unknown)],
+            DATE: [
+                MessageHandler(Filters.regex(r'.*\d{4}\/\d{1,2}\/\d{1,2}.*'), received_date),
+                CommandHandler('restart', restart),
+                CommandHandler('cancel', cancel_edit),
+                MessageHandler(Filters.all, unknown),
+            ],
 
-            USERPASS: [MessageHandler(Filters.text,
-                                      received_userpass,
-                                      ),
-                       CommandHandler('restart',
-                                      restart,
-                                      ),
-                       CommandHandler('cancel',
-                                      cancel_edit,
-                                      ),
-                       MessageHandler(Filters.all,
-                                      unknown)],
+            USERPASS: [
+                MessageHandler(Filters.text, received_userpass),
+                CommandHandler('restart', restart),
+                CommandHandler('cancel', cancel_edit),
+                MessageHandler(Filters.all, unknown),
+            ],
 
-            START_TIME: [MessageHandler(Filters.regex(r'^\d{1,2}$'),
-                                        received_start_time,
-                                        ),
-                         MessageHandler(Filters.regex(r'^\d{1,2}\:\d{1,2}$'),
-                                        received_start_time,
-                                        ),
-                         CommandHandler('restart',
-                                      restart,
-                                      ),
-                         CommandHandler('cancel',
-                                        cancel_edit,
-                                        ),
-                         MessageHandler(Filters.all,
-                                        unknown)],
+            START_TIME: [
+                MessageHandler(Filters.regex(r'^\d{1,2}$'), received_start_time),
+                MessageHandler(Filters.regex(r'^\d{1,2}\:\d{1,2}$'), received_start_time),
+                CommandHandler('restart', restart),
+                CommandHandler('cancel', cancel_edit),
+                MessageHandler(Filters.all, unknown),
+            ],
 
-            FINISH_TIME: [MessageHandler(Filters.regex(r'^\d{1,2}$'),
-                                         received_finish_time,
-                                         ),
-                          MessageHandler(Filters.regex(r'^\d{1,2}\:\d{1,2}$'),
-                                         received_finish_time,
-                                         ),
-                          CommandHandler('restart',
-                                      restart,
-                                      ),
-                          CommandHandler('cancel',
-                                         cancel_edit,
-                                         ),
-                          MessageHandler(Filters.all,
-                                         unknown)],
+            FINISH_TIME: [
+                MessageHandler(Filters.regex(r'^\d{1,2}$'), received_finish_time),
+                MessageHandler(Filters.regex(r'^\d{1,2}\:\d{1,2}$'), received_finish_time),
+                CommandHandler('restart', restart),
+                CommandHandler('cancel', cancel_edit),
+                MessageHandler(Filters.all, unknown),
+            ],
 
-            COMMENTS: [MessageHandler(Filters.text,
-                                      received_comments,
-                                      ),
-                       CommandHandler('restart',
-                                      restart,
-                                      ),
-                       CommandHandler('cancel',
-                                      cancel_edit,
-                                      ),
-                       MessageHandler(Filters.all,
-                                      unknown)],
+            COMMENTS: [
+                MessageHandler(Filters.text, received_comments),
+                CommandHandler('restart', restart),
+                CommandHandler('cancel', cancel_edit),
+                MessageHandler(Filters.all, unknown),
+            ],
 
-            LESSON: [MessageHandler(Filters.text,
-                                    received_lesson,
-                                    ),
-                     CommandHandler('restart',
-                                      restart,
-                                      ),
-                     CommandHandler('cancel',
-                                      cancel_edit,
-                                      ),
-                     MessageHandler(Filters.all,
-                                      unknown)],
+            LESSON: [
+                MessageHandler(Filters.text, received_lesson),
+                CommandHandler('restart', restart),
+                CommandHandler('cancel', cancel_edit),
+                MessageHandler(Filters.all, unknown),
+            ],
 
-            PROFESSOR: [MessageHandler(Filters.text,
-                                       received_professor,
-                                       ),
-                        CommandHandler('restart',
-                                      restart,
-                                      ),
-                       CommandHandler('cancel',
-                                      cancel_edit,
-                                      ),
-                       MessageHandler(Filters.all,
-                                      unknown)],
+            PROFESSOR: [
+                MessageHandler(Filters.text, received_professor),
+                CommandHandler('restart', restart),
+                CommandHandler('cancel', cancel_edit),
+                MessageHandler(Filters.all, unknown),
+            ],
         },
 
         fallbacks=[],
