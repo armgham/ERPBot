@@ -1,6 +1,7 @@
 # ERPBot
-@guilan_sada_bot
+address of bot: https://telegram.me/guilan_sada_bot
 
+commands for create database:
 create table USER_DATA (user_id INT, data VARCHAR(10000));
 create table CHAT_DATA (chat_id INT, data VARCHAR(100));
 create table CONVERSATIONS (conversation_name VARCHAR(50));

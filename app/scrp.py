@@ -34,7 +34,7 @@ def main(user_data, bot, update):
         desired_capabilities=DesiredCapabilities.PHANTOMJS)
     '''
     
-    driver = webdriver.PhantomJS()
+    driver = webdriver.PhantomJS(service_args=["--load-images=no"])
     
     
     #options = Options()
