@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import multiprocessing as mp
+from multiprocessing import Process
 import selenium.common.exceptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -27,7 +27,7 @@ reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (use
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
-def main(user_data, bot, chat_id):
+def main(user_data, chat_id):
     '''
     driver = webdriver.Remote(
         command_executor='http://127.0.0.1:8910',
@@ -153,9 +153,9 @@ def main(user_data, bot, chat_id):
             parts_of_row = rows[row_index].find_all('td')
             user_data['exams'].append(parts_of_row[2].find('span').text + '   :   ' +
                                       parts_of_row[exams_time_column_index].find('span').text)
-        text_process.main(user_data, bot, chat_id)
+        text_process.main(user_data, chat_id)
         gc.collect()
-        pr = mp.Process(target=time_table_file.main, args=(user_data, bot, chat_id, True))
+        pr = Process(target=time_table_file.main, args=(user_data, chat_id, True))
         pr.daemon = True
         pr.start()
         pr.join()
@@ -163,6 +163,8 @@ def main(user_data, bot, chat_id):
         # time_table_file.main(user_data, bot, update, from_scrp=True)
         
     except selenium.common.exceptions.TimeoutException:
+        from app import get_bot
+        bot = get_bot()
         
         bot.send_message(chat_id=chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
@@ -175,6 +177,8 @@ def main(user_data, bot, chat_id):
             logging.warning(str(e.args))
             pass
     except Exception as e:
+        from app import get_bot
+        bot = get_bot()
         
         bot.send_message(chat_id=chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '

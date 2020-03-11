@@ -36,7 +36,7 @@ def ds(day):
     return -1
 
 
-def main(user_data, bot, chat_id, from_scrp=False):
+def main(user_data, chat_id, from_scrp=False):
     mpl.interactive(False)
     days = []
     starts = []
@@ -187,6 +187,10 @@ def main(user_data, bot, chat_id, from_scrp=False):
     ax2.set_yticks(ax.get_yticks())
     ax2.set_yticklabels(sorted_days, fontsize=13)
     plt.subplots_adjust(left=0.06, bottom=0.26, right=0.95, top=0.96, wspace=0.2, hspace=0.2)
+
+    from app import get_bot
+
+    bot = get_bot()
 
     bot.send_message(chat_id=chat_id, text='داره میاد!!')
     bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)

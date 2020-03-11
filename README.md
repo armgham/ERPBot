@@ -9,7 +9,8 @@ create table CONVERSATIONS (conversation_name VARCHAR(50));
 ## TODO
 
 - [ ] flush command handler
-- [ ] fix bugs! (when press get the edited table first time, ...)
+- [x] fix bugs! (when press get the edited table first time, ...)
+- [x] a function to give telegram bot connection for other modules to send message ...
 - [x] make phantomjs lighter and faster
 - [ ] callbackquery >_0
 

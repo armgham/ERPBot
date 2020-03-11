@@ -9,12 +9,12 @@ import re
 import gc
 import config
 import MySQLdb
-import multiprocessing as mp
+from multiprocessing import Process
 from SqlPersistence import SqlPersistence
 import logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logging.getLogger().info('hi.')
+
 '''
 import os 47
 os.system('wget https://github.com/mozilla/geckodriver/releases/download/v0.11.1/geckodriver-v0.11.1-linux64.tar.gz')
@@ -66,7 +66,7 @@ def received_userpass(update, context):
     del user_data['choice']
     if 'time_table' in user_data:
         update.message.reply_text('خب الان برنامه رو از erp میگیرم!')
-        _thread.start_new_thread(scrp.main, (user_data, bot, update.message.chat_id))
+        _thread.start_new_thread(scrp.main, (user_data, update.message.chat_id))
         del user_data['time_table']
         bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
         return MAIN_CHOOSING
@@ -84,18 +84,17 @@ def time_table_scrp(update, context):
         bot.send_message(chat_id=update.message.chat_id, text='خب {} خودتو بده:'.format('نام کاربری'))
         user_data['choice'] = 'username'
         return USERPASS
-    _thread.start_new_thread(scrp.main, (user_data, bot, update.message.chat_id))
+    _thread.start_new_thread(scrp.main, (user_data, update.message.chat_id))
     bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
     return MAIN_CHOOSING
 
 
 def time_table(update, context):
     user_data = context.user_data
-    bot = context.bot
     if 'exams' not in user_data:
         update.message.reply_text('اول برنامتو از erp بگیر بعد!', reply_markup=markup)
         return MAIN_CHOOSING
-    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update.message.chat_id))
+    pr = Process(target=time_table_file.main, args=(user_data, update.message.chat_id))
     pr.daemon = True
     pr.start()
     # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
@@ -141,13 +140,12 @@ def received_dars(update, context):
 
 
 def received_date(update, context):
-    bot = context.bot
     user_data = context.user_data
     date = update.message.text
     user_data['edit'].append(date)
     user_data['midterm'].append('  : '.join(user_data['edit']))
     del user_data['edit']
-    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update.message.chat_id))
+    pr = Process(target=time_table_file.main, args=(user_data, update.message.chat_id))
     pr.daemon = True
     pr.start()
     # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
@@ -179,7 +177,6 @@ def start_time(update, context):
 
 def received_start_time(update, context):
     user_data = context.user_data
-    bot = context.bot
     text = update.message.text
     if re.match(r'^\d{2}$', text):
         text += ':00'
@@ -195,7 +192,7 @@ def received_start_time(update, context):
                 user_data['info'].remove(str_part_time_table)
         del user_data['edit']
 
-        pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update.message.chat_id))
+        pr = Process(target=time_table_file.main, args=(user_data, update.message.chat_id))
         pr.daemon = True
         pr.start()
         # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
@@ -232,13 +229,12 @@ def received_lesson(update, context):
 
 def received_professor(update, context):
     user_data = context.user_data
-    bot = context.bot
     text = update.message.text
     user_data['edit'].append(text)
     user_data['info'].append('\t'.join(user_data['edit']))
     del user_data['edit']
 
-    pr = mp.Process(target=time_table_file.main, args=(user_data, bot, update.message.chat_id))
+    pr = Process(target=time_table_file.main, args=(user_data, update.message.chat_id))
     pr.daemon = True
     pr.start()
     # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
@@ -265,6 +261,7 @@ def unknown(update, context):
 
 
 def main():
+    global telegram_bot
     # my_persistence = PicklePersistence('pfile', on_flush=True)
     my_db = MySQLdb.connect(host=config.MYSQL_HOST,
                             user=config.MYSQL_USERNAME,
@@ -273,6 +270,11 @@ def main():
                             charset='utf8')
     sp = SqlPersistence(my_db)
     updater = Updater(config.TOKEN, persistence=sp, use_context=True)
+
+    telegram_bot = updater.bot
+    with open('bot_file', 'wb') as bf:
+        from pickle import dump
+        dump(telegram_bot, bf)
 
     dp = updater.dispatcher
     restart_command_handler = CommandHandler('stop', restart, pass_user_data=True)
@@ -382,5 +384,14 @@ def main():
 
     updater.idle()
 
+
+def get_bot():
+    with open('bot_file', 'rb') as f:
+        from pickle import load
+        telegram_bot = load(f)
+    return telegram_bot
+
+
 if __name__ == '__main__':
+    logging.getLogger().info('hi.')
     main()

@@ -22,4 +22,4 @@ ENTRYPOINT [ "python3" ]
 
 #COPY x.py /app2.py
 
-CMD ["/app.py"] 
+CMD ["/app/app.py"] 
