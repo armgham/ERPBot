@@ -10,9 +10,10 @@ logger = logging.getLogger()
 
 class SqlPersistence(BasePersistence):
 
-    def __init__(self, database_connection, store_user_data=True, store_chat_data=False):
+    def __init__(self, database_connection, store_user_data=True, store_chat_data=False, store_bot_data=False):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
+        self.store_bot_data = store_bot_data
 
         self.db = database_connection
 
@@ -118,4 +119,61 @@ class SqlPersistence(BasePersistence):
 
 
         self.db.close()
-        logger.info('done')
+        logger.info('done bye bye!!')
+
+
+    def update_flush(self):
+        cur = self.db.cursor()
+
+        cur.execute('DROP TABLE IF EXISTS USER_DATA;')
+        cur.execute('CREATE TABLE USER_DATA (user_id INT, data VARCHAR(10000));')
+        self.db.commit()
+        logger.info('in flush')
+        counter = 0
+        for user_id, defaultdict_data in self.user_data.items():
+            data = json.dumps(defaultdict_data)
+            cur.execute('INSERT INTO USER_DATA VALUES (%s, %s);', (user_id, data))
+            counter += 1
+
+            if counter % 20 == 0:
+                self.db.commit()
+
+        self.db.commit()
+
+        cur.execute('DROP TABLE IF EXISTS CHAT_DATA;')
+        cur.execute('CREATE TABLE CHAT_DATA (chat_id INT, data VARCHAR(100));')
+        self.db.commit()
+
+        counter = 0
+        for chat_id, defaultdict_data in self.chat_data.items():
+            data = json.dumps(defaultdict_data)
+            cur.execute('INSERT INTO CHAT_DATA VALUES (%s, %s);', (chat_id, data))
+            counter += 1
+
+            if counter % 20 == 0:
+                self.db.commit()
+
+        self.db.commit()
+
+        cur.execute('DROP TABLE IF EXISTS CONVERSATIONS;')
+        cur.execute('CREATE TABLE CONVERSATIONS (conversation_name VARCHAR(50));')
+        self.db.commit()
+
+        counter = 0
+        for conversation_name, conversation_data in self.conversations.items():
+            counter += 1
+            cur.execute('INSERT INTO CONVERSATIONS VALUES (%s);', (conversation_name, ))
+            cur.execute(f'DROP TABLE IF EXISTS {conversation_name}_CONVERSATIONS')
+            cur.execute(f'CREATE TABLE {conversation_name}_CONVERSATIONS (conversation_key VARCHAR(50), conversation_state VARCHAR(50))')
+
+            for key, state in conversation_data.items():
+                cur.execute(f'INSERT INTO {conversation_name}_CONVERSATIONS VALUES (%s, %s)', (json.dumps(key), json.dumps(state)))
+                counter += 1
+
+                if counter % 20 == 0:
+                    self.db.commit()
+
+
+            self.db.commit()
+
+        logger.info('update_flush done!')

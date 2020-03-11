@@ -8,7 +8,7 @@ import time_table_file
 import re
 import gc
 import config
-import MySQLdb
+import helpers
 from multiprocessing import Process
 from SqlPersistence import SqlPersistence
 import logging
@@ -31,11 +31,7 @@ os.environ["PATH"] += os.pathsep + cwd
 MAIN_CHOOSING, DAY_CHOOSING, EDIT_CHOOSING, USERPASS, \
     START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR, CHOOSING_DARS, DATE = range(11)
 
-reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (username, password)'],
-                  ['گرفتن برنامه از erp'],
-                  ['ویرایش برنامه', 'گرفتن برنامه ویرایش شده']]
-markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-
+markup = helpers.markup
 
 def start(update, context):
     update.message.reply_text(
@@ -253,6 +249,7 @@ def restart(update, context):
     user_data = context.user_data
     user_data.clear()
     update.message.reply_text('اطلاعاتت پاک شد.', reply_markup=markup)
+    return MAIN_CHOOSING
 
 
 def unknown(update, context):
@@ -260,15 +257,16 @@ def unknown(update, context):
     return MAIN_CHOOSING
 
 
+def flush_database(update, context):
+    context.dispatcher.persistence.update_flush()
+    update.message.reply_text('ok')
+    return MAIN_CHOOSING
+
+
 def main():
-    global telegram_bot
     # my_persistence = PicklePersistence('pfile', on_flush=True)
-    my_db = MySQLdb.connect(host=config.MYSQL_HOST,
-                            user=config.MYSQL_USERNAME,
-                            passwd=config.MYSQL_PASSWORD,
-                            db=config.MYSQL_DB_NAME,
-                            charset='utf8')
-    sp = SqlPersistence(my_db)
+    
+    sp = SqlPersistence(helpers.get_database_connection(), store_user_data=True, store_chat_data=True, store_bot_data=False)
     updater = Updater(config.TOKEN, persistence=sp, use_context=True)
 
     telegram_bot = updater.bot
@@ -280,8 +278,8 @@ def main():
     restart_command_handler = CommandHandler('stop', restart, pass_user_data=True)
     dp.add_handler(restart_command_handler)
     
-    #flush_command_handler = CommandHandler('flush', flush_database)
-    #dp.add_handler(flush_command_handler)
+    flush_command_handler = CommandHandler('flush', flush_database)
+    dp.add_handler(flush_command_handler)
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
@@ -383,13 +381,6 @@ def main():
     updater.start_polling()
 
     updater.idle()
-
-
-def get_bot():
-    with open('bot_file', 'rb') as f:
-        from pickle import load
-        telegram_bot = load(f)
-    return telegram_bot
 
 
 if __name__ == '__main__':

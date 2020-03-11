@@ -12,6 +12,7 @@ from selenium import webdriver
 from time import sleep
 from bs4 import BeautifulSoup
 import text_process
+import helpers
 import time_table_file
 from telegram import ReplyKeyboardMarkup
 
@@ -21,11 +22,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger()
 
-reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (username, password)'],
-                  ['گرفتن برنامه از erp'],
-                  ['ویرایش برنامه', 'گرفتن برنامه ویرایش شده']]
-markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-
+markup = helpers.markup
 
 def main(user_data, chat_id):
     '''
@@ -163,8 +160,7 @@ def main(user_data, chat_id):
         # time_table_file.main(user_data, bot, update, from_scrp=True)
         
     except selenium.common.exceptions.TimeoutException:
-        from app import get_bot
-        bot = get_bot()
+        bot = helpers.get_bot()
         
         bot.send_message(chat_id=chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
@@ -177,8 +173,7 @@ def main(user_data, chat_id):
             logging.warning(str(e.args))
             pass
     except Exception as e:
-        from app import get_bot
-        bot = get_bot()
+        bot = helpers.get_bot()
         
         bot.send_message(chat_id=chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '

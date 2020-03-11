@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import helpers
 import re
 from telegram import ReplyKeyboardMarkup
 import logging
@@ -6,10 +7,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger()
 
-reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (username, password)'],
-                  ['گرفتن برنامه از erp'],
-                  ['ویرایش برنامه', 'گرفتن برنامه ویرایش شده']]
-markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+markup = helpers.markup
 
 
 def main(user_data, chat_id):
@@ -32,8 +30,8 @@ def main(user_data, chat_id):
                 logger.info(dars)
                 logger.info(str(e.args))
                 logger.info(str(user_data))
-                from app import get_bot
-                bot = get_bot()
+                
+                bot = helpers.get_bot()
                 bot.send_message(chat_id=chat_id, text='درس ' + dars + ' : \"' + line + ' ' + ostad + ' \"' + 'یه مشکلی داره نتونستم بیارم تو برنامه. اگه خواستی میتونی با '
                                                   'استفاده از (ویرایش برنامه) دستی یه بخش جدید به برنامه اضافه کنی',
                                  reply_markup=markup)
