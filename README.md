@@ -12,5 +12,5 @@ create table CONVERSATIONS (conversation_name VARCHAR(50));
 - [x] fix bugs! (when press get the edited table first time, ...)
 - [x] a function to give telegram bot connection for other modules to send message ...
 - [x] make phantomjs lighter and faster
-- [ ] callbackquery >_0
-- [ ] send logs to users.
+- [x] send logs to users.
+- [ ] handle urllib3.connection.HTTPConnection error
