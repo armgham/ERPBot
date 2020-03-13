@@ -30,6 +30,9 @@ def main(user_data, chat_id):
         command_executor='http://127.0.0.1:8910',
         desired_capabilities=DesiredCapabilities.PHANTOMJS)
     '''
+    bot = helpers.get_bot()
+    sent_message = bot.send_message(chat_id=chat_id, text='باز کردن مرورگر')
+    sent_message = sent_message.message_id
     
     driver = webdriver.PhantomJS(service_args=["--load-images=no"])
     
@@ -45,12 +48,14 @@ def main(user_data, chat_id):
     #driver = webdriver.Firefox(options=options)
     logger.info('driver created.')
     try:
+        bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='باز کردن سایت')
         driver.get("http://sada.guilan.ac.ir/Dashboard.aspx")
         if 'sada.guilan.ac.ir/GoToDashboard.aspx' in driver.current_url:
             driver.find_element_by_class_name('refreshDash').click()
         
         
         wait = WebDriverWait(driver, 10)
+        bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='ورود به سامانه')
         # elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'ورود به س')))
         elem = wait.until(ec.presence_of_element_located((By.CLASS_NAME, 'title')))
         elem.click()
@@ -62,7 +67,7 @@ def main(user_data, chat_id):
 
         elem = driver.find_element_by_name('SSMPassword_txt')
         elem.send_keys(user_data['password'] + Keys.ENTER)
-        
+        bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='وارد شدن با یوزرنیم و پسورد')
         sleep(1.2)
         elem = wait.until(ec.presence_of_element_located((By.ID, 'Default_URL_TAB_ID')))
         elem = elem.find_element_by_class_name('close')
@@ -75,6 +80,7 @@ def main(user_data, chat_id):
         wait = WebDriverWait(driver, 10)
         elem = wait.until(ec.presence_of_element_located((By.ID, 'userInfoTitle')))
 
+        bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='رفتن به قسمت امور آموزش')
         elem.click()
         # elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'امور آموزش')))
         elem = wait.until(ec.presence_of_element_located((By.XPATH, '//*[@onclick="onMenuItemClick(this,\'0202\',\'None\');"]')))
@@ -109,12 +115,13 @@ def main(user_data, chat_id):
         time_column_index = 11
         gc.collect()
         # elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'فرم تثب')))
+        bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='رفتن به قسمت فرم تثبیت انتخاب واحد')
         elem = wait.until(ec.presence_of_element_located((By.XPATH, '//*[@onclick="onMenuItemClick(this,\'020203\',\'Tab\');"]')))
         elem.click()
         elem = wait.until(ec.presence_of_element_located((By.ID, 'iframe_020203')))
         driver.get(elem.get_property('src'))
         time_column_index = 11
-
+        bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج اطلاعات از سایت')
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         driver.quit()
         rows = soup.find_all('table', class_='grd')
@@ -150,8 +157,11 @@ def main(user_data, chat_id):
             parts_of_row = rows[row_index].find_all('td')
             user_data['exams'].append(parts_of_row[2].find('span').text + '   :   ' +
                                       parts_of_row[exams_time_column_index].find('span').text)
+
+        bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='پردازش روی اطلاعات بدست اومده')
         text_process.main(user_data, chat_id)
         gc.collect()
+        bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='ساختن تصویر برنامه')
         pr = Process(target=time_table_file.main, args=(user_data, chat_id, True))
         pr.daemon = True
         pr.start()
@@ -160,8 +170,6 @@ def main(user_data, chat_id):
         # time_table_file.main(user_data, bot, update, from_scrp=True)
         
     except selenium.common.exceptions.TimeoutException:
-        bot = helpers.get_bot()
-        
         bot.send_message(chat_id=chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
                               'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
@@ -173,8 +181,6 @@ def main(user_data, chat_id):
             logging.warning(str(e.args))
             pass
     except Exception as e:
-        bot = helpers.get_bot()
-        
         bot.send_message(chat_id=chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
                               'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
