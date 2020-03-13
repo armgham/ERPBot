@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from multiprocessing import Process
-import selenium.common.exceptions
+from urllib3.exceptions import ProtocolError
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as ec
@@ -169,7 +170,7 @@ def main(user_data, chat_id):
 
         # time_table_file.main(user_data, bot, update, from_scrp=True)
         
-    except selenium.common.exceptions.TimeoutException:
+    except TimeoutException:
         bot.send_message(chat_id=chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
                               'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
@@ -180,6 +181,20 @@ def main(user_data, chat_id):
         except Exception as e:
             logging.warning(str(e.args))
             pass
+    
+    except ProtocolError:
+        bot.send_message(chat_id=chat_id,
+                        text='خب مشکل از سمت منه. در واقع چون سرور مجانیه و ضعیف, حافظه رم پر شده. چند دقیقه دیگه دوباره تست کن اگه درست نشد به این آیدی یه پیغام بفرست: @ArmanG98',
+                        reply_markup=markup)
+        bot.send_message(chat_id='@armgg', text='سرور رو درست کن داش', reply_markup=markup)
+        logging.info(' || ProtocolError  ||')
+        try:
+            driver.quit()
+            logging.info(str(user_data['username'] + '  ||  ' + user_data['password']))
+        except Exception as e:
+            logging.warning(str(e.args))
+            pass
+    
     except Exception as e:
         bot.send_message(chat_id=chat_id,
                          text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
