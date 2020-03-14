@@ -57,7 +57,7 @@ def main(user_data, chat_id, from_scrp=False):
             coms.append(get_display(persian_reshaper.reshape(data[3])))
         darss.append(get_display(persian_reshaper.reshape(data[4])))
     days2 = set(days)
-    prop = fm.FontProperties(fname=os.path.abspath('app/fonts/XP_ZibaBd.ttf'))
+    prop = fm.FontProperties(fname=os.path.dirname(os.path.abspath(__file__))+'/fonts/XP_ZibaBd.ttf')  # os.path.abspath('app/fonts/XP_ZibaBd.ttf'))
     dd = dict((ds(x), x) for x in days2)
     sorted_days = []
     for key in sorted(dd):

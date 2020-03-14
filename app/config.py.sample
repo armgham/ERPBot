@@ -7,3 +7,4 @@ MYSQL_HOST = 'host'
 MYSQL_USERNAME = 'username'
 MYSQL_PASSWORD = 'pass'
 MYSQL_DB_NAME = 'db_name'
+CHAT_ID_OF_ADMIN = 123456789 # chat_id

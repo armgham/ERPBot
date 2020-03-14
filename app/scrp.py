@@ -186,7 +186,8 @@ def main(user_data, chat_id):
         bot.send_message(chat_id=chat_id,
                         text='خب مشکل از سمت منه. در واقع چون سرور مجانیه و ضعیف, حافظه رم پر شده. چند دقیقه دیگه دوباره تست کن اگه درست نشد به این آیدی یه پیغام بفرست: @ArmanG98',
                         reply_markup=markup)
-        bot.send_message(chat_id='@armgg', text='سرور رو درست کن داش', reply_markup=markup)
+        from config import CHAT_ID_OF_ADMIN
+        bot.send_message(chat_id=CHAT_ID_OF_ADMIN, text='سرور رو درست کن داش', reply_markup=markup)
         logging.info(' || ProtocolError  ||')
         try:
             driver.quit()
