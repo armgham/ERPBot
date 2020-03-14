@@ -32,6 +32,7 @@ def main(user_data, chat_id):
         desired_capabilities=DesiredCapabilities.PHANTOMJS)
     '''
     bot = helpers.get_bot()
+    sleep(0.1)
     sent_message = bot.send_message(chat_id=chat_id, text='باز کردن مرورگر')
     sent_message = sent_message.message_id
     
@@ -48,21 +49,20 @@ def main(user_data, chat_id):
     #driver = webdriver.Chrome(chrome_options=chrome_options)
     #driver = webdriver.Firefox(options=options)
     logger.info('driver created.')
+    wait = WebDriverWait(driver, 10)
     try:
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='باز کردن سایت')
-        driver.get("http://sada.guilan.ac.ir/Dashboard.aspx")
+        driver.get("http://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx")
         if 'sada.guilan.ac.ir/GoToDashboard.aspx' in driver.current_url:
+            logger.info('ey baba???????????????????????????')
             driver.find_element_by_class_name('refreshDash').click()
+            # elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'ورود به س')))
+            elem = wait.until(ec.presence_of_element_located((By.CLASS_NAME, 'title')))
+            elem.click()
+            elem = wait.until(ec.presence_of_element_located((By.ID, 'iframe_040101')))
+            driver.get(elem.get_property('src'))
         
-        
-        wait = WebDriverWait(driver, 10)
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='ورود به سامانه')
-        # elem = wait.until(ec.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'ورود به س')))
-        elem = wait.until(ec.presence_of_element_located((By.CLASS_NAME, 'title')))
-        elem.click()
-        elem = wait.until(ec.presence_of_element_located((By.ID, 'iframe_040101')))
-
-        driver.get(elem.get_property('src'))
         elem = driver.find_element_by_name('SSMUsername_txt')
         elem.send_keys(user_data['username'])
 
