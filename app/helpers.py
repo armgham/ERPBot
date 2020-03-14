@@ -15,13 +15,3 @@ def get_bot():
         from pickle import load
         telegram_bot = load(f)
     return telegram_bot
-
-
-def get_database_connection():
-    return MySQLdb.connect(
-        host=config.MYSQL_HOST,
-        user=config.MYSQL_USERNAME,
-        passwd=config.MYSQL_PASSWORD,
-        db=config.MYSQL_DB_NAME,
-        charset='utf8',
-        )

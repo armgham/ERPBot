@@ -266,7 +266,8 @@ def flush_database(update, context):
 def main():
     # my_persistence = PicklePersistence('pfile', on_flush=True)
     
-    sp = SqlPersistence(helpers.get_database_connection(), store_user_data=True, store_chat_data=True, store_bot_data=False)
+    sp = SqlPersistence(config.MYSQL_HOST, config.MYSQL_USERNAME, config.MYSQL_PASSWORD, config.MYSQL_DB_NAME,
+                        store_user_data=True, store_chat_data=True, store_bot_data=False)
     updater = Updater(config.TOKEN, persistence=sp, use_context=True)
 
     telegram_bot = updater.bot

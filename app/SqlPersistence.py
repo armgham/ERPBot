@@ -1,6 +1,7 @@
 from telegram.ext import BasePersistence
 
 from collections import defaultdict
+import MySQLdb
 import json
 import logging
 logging.basicConfig(level=logging.INFO,
@@ -8,14 +9,27 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger()
 
 
+def get_database_connection(mysql_host, mysql_user, mysql_passwd, mysql_db):
+    return MySQLdb.connect(
+        host=mysql_host,
+        user=mysql_user,
+        passwd=mysql_passwd,
+        db=mysql_db,
+        charset='utf8',
+        )
+
 class SqlPersistence(BasePersistence):
 
-    def __init__(self, database_connection, store_user_data=True, store_chat_data=False, store_bot_data=False):
+    def __init__(self, mysql_host, mysql_user, mysql_passwd, mysql_db, store_user_data=True, store_chat_data=False, store_bot_data=False):
         self.store_user_data = store_user_data
         self.store_chat_data = store_chat_data
         self.store_bot_data = store_bot_data
+        self.mysql_host = mysql_host
+        self.mysql_user = mysql_user
+        self.mysql_passwd = mysql_passwd
+        self.mysql_db = mysql_db
 
-        self.db = database_connection
+        self.db = get_database_connection(self.mysql_host, self.mysql_user, self.mysql_passwd, self.mysql_db)
 
         self.user_data = defaultdict(dict)
         self.chat_data = defaultdict(dict)
@@ -42,6 +56,7 @@ class SqlPersistence(BasePersistence):
                             key = tuple(json.loads(conversation_key))
                             state = json.loads(conversation_state)
                             self.conversations[name] = {key: state}
+        self.db.close()
 
     def get_user_data(self):
         return self.user_data.copy()
@@ -64,6 +79,7 @@ class SqlPersistence(BasePersistence):
         self.conversations[name][key] = new_state
 
     def flush(self):
+        self.db = get_database_connection(self.mysql_host, self.mysql_user, self.mysql_passwd, self.mysql_db)
         cur = self.db.cursor()
 
         cur.execute('DROP TABLE IF EXISTS USER_DATA;')
@@ -123,6 +139,7 @@ class SqlPersistence(BasePersistence):
 
 
     def update_flush(self):
+        self.db = get_database_connection(self.mysql_host, self.mysql_user, self.mysql_passwd, self.mysql_db)
         cur = self.db.cursor()
 
         cur.execute('DROP TABLE IF EXISTS USER_DATA;')
