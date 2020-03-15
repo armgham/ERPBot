@@ -14,6 +14,7 @@ from SqlPersistence import SqlPersistence
 import logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 '''
 import os 47
@@ -35,7 +36,7 @@ markup = helpers.markup
 
 def start(update, context):
     update.message.reply_text(
-        'سلام! کار من اینه که با استفاده از یوزرنیم و پسورد erp وارد سامانه بشم'
+        'سلام! کار من اینه که با استفاده از یوزرنیم و پسورد sada.guilan.ac.ir وارد سامانه بشم'
         ' و برنامه تحصیلی تو رو به شکل منظمی دربیارم و تحویلت بدم!! شبیه عکس پروفایلم!',
         reply_markup=markup
     )
@@ -237,11 +238,13 @@ def received_professor(update, context):
     return MAIN_CHOOSING
 
 
-def cancel_edit(update, context):
+def cancel(update, context):
     user_data = context.user_data
     update.message.reply_text('کنسل شد!', reply_markup=markup)
     if 'edit' in user_data:
         del user_data['edit']
+    if 'edit_mode' in user_data:
+        del user_data['edit_mode']
     return MAIN_CHOOSING
 
 
@@ -261,6 +264,16 @@ def flush_database(update, context):
     context.dispatcher.persistence.update_flush()
     update.message.reply_text('ok')
     return MAIN_CHOOSING
+
+
+def new_start(update, context):
+    update.message.reply_text('سلام مجدد دوستان بات آپدیت شده. الان دیگه ویرایش هاتون احتمالا! ذخیره میشه و روند گرفتن برنامه از سایت هم سریعتر شده.', reply_markup=markup)
+    return MAIN_CHOOSING
+
+
+def error(update, context):
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
@@ -283,101 +296,74 @@ def main():
     dp.add_handler(flush_command_handler)
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
+        entry_points=[CommandHandler('start', start), MessageHandler(Filters.all, new_start)],
 
         states={
             MAIN_CHOOSING: [
                 MessageHandler(Filters.regex(r'^.*\(username\, password\)$'), user_pass),
-                MessageHandler(Filters.regex(r'^گرفتن برنامه از erp$'), time_table_scrp),
-                CommandHandler('start', start),
+                MessageHandler(Filters.regex('^گرفتن برنامه از سایت$'), time_table_scrp),
                 MessageHandler(Filters.regex('^ویرایش برنامه$'), edit),
                 MessageHandler(Filters.regex('^گرفتن برنامه ویرایش شده$'), time_table),
-                CommandHandler('cancel', cancel_edit),
-                CommandHandler('restart', restart),
-                MessageHandler(Filters.all, unknown),
             ],
     
             DAY_CHOOSING: [
                 MessageHandler(Filters.regex('^(پنج شنبه|سه شنبه|دوشنبه|چهارشنبه|يکشنبه|شنبه)$'), start_time),
-                CommandHandler('cancel', cancel_edit),
-                CommandHandler('restart', restart),
-                MessageHandler(Filters.all, unknown),
             ],
 
             EDIT_CHOOSING: [
                 MessageHandler(Filters.regex('^میانترم$'), midterm),
-                MessageHandler(Filters.regex('^(ایجاد بخش جدید|حذف یک بخش)$'), day),           
-                CommandHandler('cancel', cancel_edit),
-                CommandHandler('restart', restart),
-                MessageHandler(Filters.all, unknown),
+                MessageHandler(Filters.regex('^(ایجاد بخش جدید|حذف یک بخش)$'), day),
             ],
 
             CHOOSING_DARS: [
                 MessageHandler(Filters.text, received_dars),
-                CommandHandler('restart', restart),
-                CommandHandler('cancel', cancel_edit),
-                MessageHandler(Filters.all, unknown),
             ],
                                   
             DATE: [
                 MessageHandler(Filters.regex(r'.*\d{4}\/\d{1,2}\/\d{1,2}.*'), received_date),
-                CommandHandler('restart', restart),
-                CommandHandler('cancel', cancel_edit),
-                MessageHandler(Filters.all, unknown),
             ],
 
             USERPASS: [
                 MessageHandler(Filters.text, received_userpass),
-                CommandHandler('restart', restart),
-                CommandHandler('cancel', cancel_edit),
-                MessageHandler(Filters.all, unknown),
             ],
 
             START_TIME: [
                 MessageHandler(Filters.regex(r'^\d{1,2}$'), received_start_time),
                 MessageHandler(Filters.regex(r'^\d{1,2}\:\d{1,2}$'), received_start_time),
-                CommandHandler('restart', restart),
-                CommandHandler('cancel', cancel_edit),
-                MessageHandler(Filters.all, unknown),
             ],
 
             FINISH_TIME: [
                 MessageHandler(Filters.regex(r'^\d{1,2}$'), received_finish_time),
                 MessageHandler(Filters.regex(r'^\d{1,2}\:\d{1,2}$'), received_finish_time),
-                CommandHandler('restart', restart),
-                CommandHandler('cancel', cancel_edit),
-                MessageHandler(Filters.all, unknown),
             ],
 
             COMMENTS: [
                 MessageHandler(Filters.text, received_comments),
-                CommandHandler('restart', restart),
-                CommandHandler('cancel', cancel_edit),
-                MessageHandler(Filters.all, unknown),
             ],
 
             LESSON: [
                 MessageHandler(Filters.text, received_lesson),
-                CommandHandler('restart', restart),
-                CommandHandler('cancel', cancel_edit),
-                MessageHandler(Filters.all, unknown),
             ],
 
             PROFESSOR: [
                 MessageHandler(Filters.text, received_professor),
-                CommandHandler('restart', restart),
-                CommandHandler('cancel', cancel_edit),
-                MessageHandler(Filters.all, unknown),
             ],
         },
 
-        fallbacks=[],
-        allow_reentry=True,
+        fallbacks=[
+            CommandHandler('start', start),
+            CommandHandler('restart', restart),
+            CommandHandler('cancel', cancel),
+            MessageHandler(Filters.all, unknown),
+        ],
+        # allow_reentry=True,
         name="my_conversation",
         persistent=True
     )
 
     dp.add_handler(conv_handler)
+
+    dp.add_error_handler(error)
 
     updater.start_polling()
 
