@@ -262,7 +262,7 @@ def unknown(update, context):
 
 def flush_database(update, context):
     context.dispatcher.persistence.update_flush()
-    update.message.reply_text('ok')
+    update.message.reply_text('ok', reply_markup=markup)
     return MAIN_CHOOSING
 
 
@@ -292,8 +292,6 @@ def main():
     restart_command_handler = CommandHandler('stop', restart, pass_user_data=True)
     dp.add_handler(restart_command_handler)
     
-    flush_command_handler = CommandHandler('flush', flush_database)
-    dp.add_handler(flush_command_handler)
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start), MessageHandler(Filters.all, new_start)],
@@ -354,6 +352,7 @@ def main():
             CommandHandler('start', start),
             CommandHandler('restart', restart),
             CommandHandler('cancel', cancel),
+            CommandHandler('flush', flush_database),
             MessageHandler(Filters.all, unknown),
         ],
         # allow_reentry=True,

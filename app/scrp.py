@@ -38,7 +38,6 @@ def main(user_data, chat_id):
     
     driver = webdriver.PhantomJS(service_args=["--load-images=no"])
     
-    
     #options = Options()
     #chrome_options = webdriver.ChromeOptions()
     #logger.info('00000')
@@ -67,18 +66,13 @@ def main(user_data, chat_id):
         elem.send_keys(user_data['username'])
 
         elem = driver.find_element_by_name('SSMPassword_txt')
-        elem.send_keys(user_data['password'] + Keys.ENTER)
+        elem.send_keys(user_data['password'])
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='وارد شدن با یوزرنیم و پسورد')
-        sleep(1.2)
+        elem.send_keys(Keys.ENTER)
+        sleep(0.75)
         elem = wait.until(ec.presence_of_element_located((By.ID, 'Default_URL_TAB_ID')))
         elem = elem.find_element_by_class_name('close')
         elem.click()
-        try:
-            wait = WebDriverWait(driver, 0.01)
-            elem = wait.until(ec.presence_of_element_located((By.ID, 'userInfoTitle')))
-        except:
-            logger.debug('')
-        wait = WebDriverWait(driver, 10)
         elem = wait.until(ec.presence_of_element_located((By.ID, 'userInfoTitle')))
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='رفتن به قسمت امور آموزش')
