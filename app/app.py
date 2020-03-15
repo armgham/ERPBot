@@ -62,12 +62,12 @@ def received_userpass(update, context):
         return USERPASS
     del user_data['choice']
     if 'time_table' in user_data:
-        update.message.reply_text('خب الان برنامه رو از erp میگیرم!')
+        update.message.reply_text('خب الان برنامه رو از سایت میگیرم!')
         _thread.start_new_thread(scrp.main, (user_data, update.message.chat_id))
         del user_data['time_table']
         bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
         return MAIN_CHOOSING
-    update.message.reply_text('خب اطلاعات گرفته شد! الان میتونی برنامه رو از erp بگیری!',
+    update.message.reply_text('خب اطلاعات گرفته شد! الان میتونی برنامه رو از سایت بگیری!',
                               reply_markup=markup)
     return MAIN_CHOOSING
 
@@ -89,7 +89,7 @@ def time_table_scrp(update, context):
 def time_table(update, context):
     user_data = context.user_data
     if 'exams' not in user_data:
-        update.message.reply_text('اول برنامتو از erp بگیر بعد!', reply_markup=markup)
+        update.message.reply_text('اول برنامتو از سایت بگیر بعد!', reply_markup=markup)
         return MAIN_CHOOSING
     pr = Process(target=time_table_file.main, args=(user_data, update.message.chat_id))
     pr.daemon = True
