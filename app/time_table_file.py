@@ -187,13 +187,13 @@ def main(user_data, chat_id, from_scrp=False):
 
     bot = helpers.get_bot()
 
-    bot.send_message(chat_id=chat_id, text='داره میاد!!')
+    sent_message = bot.send_message(chat_id=chat_id, text='داره میاد!!')
     bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
     
     
     plt.savefig('{0}.png'.format(user_data['username'] + 'barn'), dpi=120)
     
-    time.sleep(1)
+    time.sleep(0.5)
 
     plt.savefig('{0}.pdf'.format(user_data['username'] + 'barn'))
     
@@ -208,14 +208,16 @@ def main(user_data, chat_id, from_scrp=False):
     time.sleep(0.5)
     with open('{0}.png'.format(user_data['username'] + 'barn'), 'rb') as file_to_send:
         bot.send_document(chat_id=chat_id, document=file_to_send)
+
+    bot.delete_message(chat_id=chat_id, message_id=sent_message.message_id)
     
-    time.sleep(2)
     bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
+    time.sleep(1)
     with open('{0}.pdf'.format(user_data['username'] + 'barn'), 'rb') as file_to_send:
         bot.send_document(chat_id=chat_id, document=file_to_send, reply_markup=markup)
     
     # plt.show()
-    time.sleep(2.5)
+    time.sleep(2)
     os.remove('{0}.png'.format(user_data['username'] + 'barn'))
     os.remove('{0}.pdf'.format(user_data['username'] + 'barn'))
     

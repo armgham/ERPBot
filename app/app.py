@@ -16,6 +16,10 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+
+
+import scrap_requets
+
 '''
 import os 47
 os.system('wget https://github.com/mozilla/geckodriver/releases/download/v0.11.1/geckodriver-v0.11.1-linux64.tar.gz')
@@ -52,7 +56,7 @@ def user_pass(update, context):
 
 def received_userpass(update, context):
     user_data = context.user_data
-    bot = context.bot
+    # bot = context.bot
     text = update.message.text
     category = user_data['choice']
     user_data[category] = text
@@ -63,9 +67,9 @@ def received_userpass(update, context):
     del user_data['choice']
     if 'time_table' in user_data:
         update.message.reply_text('خب الان برنامه رو از سایت میگیرم!')
-        _thread.start_new_thread(scrp.main, (user_data, update.message.chat_id))
+        _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id))
         del user_data['time_table']
-        bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
+        # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
         return MAIN_CHOOSING
     update.message.reply_text('خب اطلاعات گرفته شد! الان میتونی برنامه رو از سایت بگیری!',
                               reply_markup=markup)
@@ -81,8 +85,15 @@ def time_table_scrp(update, context):
         bot.send_message(chat_id=update.message.chat_id, text='خب {} خودتو بده:'.format('نام کاربری'))
         user_data['choice'] = 'username'
         return USERPASS
+    _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id))
+    # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
+    return MAIN_CHOOSING
+
+
+def time_table_scrp_selenium(update, context):
+    user_data = context.user_data
     _thread.start_new_thread(scrp.main, (user_data, update.message.chat_id))
-    bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
+    update.message.reply_text('الان از یه روش دیگه میرم این یکی یه ذره طول میکشه!')
     return MAIN_CHOOSING
 
 
@@ -302,6 +313,7 @@ def main():
                 MessageHandler(Filters.regex('^گرفتن برنامه از سایت$'), time_table_scrp),
                 MessageHandler(Filters.regex('^ویرایش برنامه$'), edit),
                 MessageHandler(Filters.regex('^گرفتن برنامه ویرایش شده$'), time_table),
+                MessageHandler(Filters.regex('^گرفتن برنامه از یه راه دیگه$'), time_table_scrp_selenium)
             ],
     
             DAY_CHOOSING: [

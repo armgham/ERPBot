@@ -15,7 +15,6 @@ from bs4 import BeautifulSoup
 import text_process
 import helpers
 import time_table_file
-from telegram import ReplyKeyboardMarkup
 
 import gc
 import logging
@@ -165,40 +164,36 @@ def main(user_data, chat_id):
         # time_table_file.main(user_data, bot, update, from_scrp=True)
         
     except TimeoutException:
-        bot.send_message(chat_id=chat_id,
-                         text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
-                              'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
-        logging.info('selenium common exceptions  || TimeoutException  ||')
+        bot.send_message(chat_id=chat_id, text='بازم ارور🤦‍♂️' + ' نمیدونم مشکل چیه. میتونی دوباره تست کنی اگه بازم درست نشد به این آیدی یه پیغام بفرست: @ArmanG98 🙏', reply_markup=markup)
+        logger.info('selenium common exceptions  || TimeoutException  ||')
         try:
             driver.quit()
-            logging.info(str(user_data['username'] + '  ||  ' + user_data['password']))
+            logger.info(str(user_data['username'] + '  ||  ' + user_data['password']))
         except Exception as e:
-            logging.warning(str(e.args))
+            logger.warning(str(e.args))
             pass
     
     except ProtocolError:
         bot.send_message(chat_id=chat_id,
-                        text='خب مشکل از سمت منه. در واقع چون سرور مجانیه و ضعیف, حافظه رم پر شده. چند دقیقه دیگه دوباره تست کن اگه درست نشد به این آیدی یه پیغام بفرست: @ArmanG98',
+                        text='خب مشکل از سمت منه. در واقع چون سرور مجانیه و ضعیف, حافظه رم پر شده. چند دقیقه دیگه دوباره تست کن اگه درست نشد به این آیدی یه پیغام بفرست: @ArmanG98 🙏' + ' یا اینکه فرم تثبیت انتخاب واحدت کار نمیکنه!',
                         reply_markup=markup)
-        from config import CHAT_ID_OF_ADMIN
-        bot.send_message(chat_id=CHAT_ID_OF_ADMIN, text='سرور رو درست کن داش', reply_markup=markup)
-        logging.info(' || ProtocolError  ||')
+        #from config import CHAT_ID_OF_ADMIN
+        #bot.send_message(chat_id=CHAT_ID_OF_ADMIN, text='سرور رو درست کن داش', reply_markup=markup)
+        logger.info(' || ProtocolError  ||')
         try:
             driver.quit()
-            logging.info(str(user_data['username'] + '  ||  ' + user_data['password']))
+            logger.info(str(user_data['username'] + '  ||  ' + user_data['password']))
         except Exception as e:
-            logging.warning(str(e.args))
+            logger.warning(str(e.args))
             pass
     
     except Exception as e:
-        bot.send_message(chat_id=chat_id,
-                         text='نمیدونم مشکل از تو بود یا سایت یا من؟! ولی محض اطمینان یه بار دیگه یوزر و پسوردتو با دستور (فرستادن نام کاربری و کلمه عبور) درست '
-                              'بفرست و دوباره تست کن اگه نتونستم که دیگه شرمنده.', reply_markup=markup)
-        logging.warning(str(e.args))
+        bot.send_message(chat_id=chat_id, text='بازم ارور🤦‍♂️' + ' نمیدونم مشکل چیه. میتونی دوباره تست کنی اگه بازم درست نشد به این آیدی یه پیغام بفرست: @ArmanG98 🙏', reply_markup=markup)
+        logger.warning(str(e.args))
         
         try:
             driver.quit()
-            logging.info(str(user_data['username'] + '  ||  ' + user_data['password']))
+            logger.info(str(user_data['username'] + '  ||  ' + user_data['password']))
         except Exception as e2:
-            logging.info(str(e2.args))
+            logger.info(str(e2.args))
             pass
