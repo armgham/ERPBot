@@ -90,6 +90,12 @@ def time_table_scrp(update, context):
     return MAIN_CHOOSING
 
 
+def time_table_scrp_debtor(update, context):
+    user_data = context.user_data
+    _thread.start_new_thread(scrap_requets.debtor_main, (user_data, update.message.chat_id))
+    return MAIN_CHOOSING
+
+
 def time_table_scrp_selenium(update, context):
     user_data = context.user_data
     _thread.start_new_thread(scrp.main, (user_data, update.message.chat_id))
@@ -313,7 +319,8 @@ def main():
                 MessageHandler(Filters.regex('^گرفتن برنامه از سایت$'), time_table_scrp),
                 MessageHandler(Filters.regex('^ویرایش برنامه$'), edit),
                 MessageHandler(Filters.regex('^گرفتن برنامه ویرایش شده$'), time_table),
-                MessageHandler(Filters.regex('^گرفتن برنامه از یه راه دیگه$'), time_table_scrp_selenium)
+                MessageHandler(Filters.regex('^گرفتن برنامه از یه راه دیگه$'), time_table_scrp_selenium),
+                MessageHandler(Filters.regex('^گرفتن برنامه از یه راه دیگه واسه دانشجوهایی که بدهی دارن$'), time_table_scrp_debtor),
             ],
     
             DAY_CHOOSING: [
