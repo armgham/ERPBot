@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from telegram import ReplyKeyboardMarkup
-import MySQLdb
 import config
 
 

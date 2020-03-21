@@ -320,7 +320,7 @@ def main():
                 MessageHandler(Filters.regex('^ویرایش برنامه$'), edit),
                 MessageHandler(Filters.regex('^گرفتن برنامه ویرایش شده$'), time_table),
                 MessageHandler(Filters.regex('^گرفتن برنامه از یه راه دیگه$'), time_table_scrp_selenium),
-                MessageHandler(Filters.regex('^گرفتن برنامه از یه راه دیگه واسه دانشجوهایی که بدهی دارن$'), time_table_scrp_debtor),
+                MessageHandler(Filters.regex('^👈گرفتن برنامه از یه راه دیگه واسه دانشجوهایی که بدهی دارن$'), time_table_scrp_debtor),
             ],
     
             DAY_CHOOSING: [

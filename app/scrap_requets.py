@@ -117,7 +117,7 @@ def main(user_data, chat_id):
             text_message += 'چون فرم تثبیت کار نکرده از یه راه دیگه میشه رفت الان یه دکمه دیگه اضافه کردم واست اونو میتونی امتحان کنی. منتها امتحانا رو نمیتونم واست لیست کنم.'
 
             reply_keyboard = [x.copy() for x in helpers.reply_keyboard]
-            reply_keyboard[1].append('گرفتن برنامه از یه راه دیگه واسه دانشجوهایی که بدهی دارن')
+            reply_keyboard[1].append('👈گرفتن برنامه از یه راه دیگه واسه دانشجوهایی که بدهی دارن')
             from telegram import ReplyKeyboardMarkup
             markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
         bot.send_message(chat_id=chat_id, text='خب به ارور رسیدیم! : ' + text_message, reply_markup=markup)
