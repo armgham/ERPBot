@@ -16,4 +16,4 @@ create table CONVERSATIONS (conversation_name VARCHAR(50));
 - [x] handle urllib3.connection.HTTPConnection(urllib3.exceptions.ProtocolError) error
 - [x] find a way for debtor students
 - [x] use requests for web-scrapping
-- [ ] memory management while using matplotlib
+- [x] memory management while using matplotlib

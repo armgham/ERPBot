@@ -156,12 +156,7 @@ def main(user_data, chat_id):
         text_process.main(user_data, chat_id)
         gc.collect()
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='ساختن تصویر برنامه')
-        pr = Process(target=time_table_file.main, args=(user_data, chat_id, True))
-        pr.daemon = True
-        pr.start()
-        pr.join()
-
-        # time_table_file.main(user_data, bot, update, from_scrp=True)
+        helpers.ProcessManager.run_join(target=time_table_file.main, args=(user_data, chat_id, True))
         
     except TimeoutException:
         bot.send_message(chat_id=chat_id, text='بازم ارور🤦‍♂️' + ' نمیدونم مشکل چیه. میتونی دوباره تست کنی اگه بازم درست نشد به این آیدی یه پیغام بفرست: @ArmanG98 🙏', reply_markup=markup)

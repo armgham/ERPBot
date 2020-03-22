@@ -101,10 +101,7 @@ def main(user_data, chat_id):
         text_process.main(user_data, chat_id)
         gc.collect()
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='ساختن تصویر برنامه ...')
-        pr = Process(target=time_table_file.main, args=(user_data, chat_id, True))
-        pr.daemon = True
-        pr.start()
-        pr.join()
+        helpers.ProcessManager.run_join(target=time_table_file.main, args=(user_data, chat_id, True))
 
     except MyError as e:
         logger.info(str(user_data['username'] + '  ||  ' + user_data['password']))
@@ -208,10 +205,7 @@ def debtor_main(user_data, chat_id):
         text_process.main(user_data, chat_id)
         gc.collect()
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='ساختن تصویر برنامه ...')
-        pr = Process(target=time_table_file.main, args=(user_data, chat_id, True))
-        pr.daemon = True
-        pr.start()
-        pr.join()
+        helpers.ProcessManager.run_join(target=time_table_file.main, args=(user_data, chat_id, True))
 
     except MyError as e:
         logger.info(str(user_data['username'] + '  ||  ' + user_data['password']))

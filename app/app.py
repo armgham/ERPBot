@@ -108,10 +108,8 @@ def time_table(update, context):
     if 'exams' not in user_data:
         update.message.reply_text('اول برنامتو از سایت بگیر بعد!', reply_markup=markup)
         return MAIN_CHOOSING
-    pr = Process(target=time_table_file.main, args=(user_data, update.message.chat_id))
-    pr.daemon = True
-    pr.start()
-    # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
+    helpers.ProcessManager.run(target=time_table_file.main, args=(user_data, update.message.chat_id))
+    update.message.reply_text('ساختن تصویر برنامه ...')
     return MAIN_CHOOSING
 
 
@@ -159,10 +157,8 @@ def received_date(update, context):
     user_data['edit'].append(date)
     user_data['midterm'].append('  : '.join(user_data['edit']))
     del user_data['edit']
-    pr = Process(target=time_table_file.main, args=(user_data, update.message.chat_id))
-    pr.daemon = True
-    pr.start()
-    # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
+    helpers.ProcessManager.run(target=time_table_file.main, args=(user_data, update.message.chat_id))
+    update.message.reply_text('ساختن تصویر برنامه ...')
     return MAIN_CHOOSING
 
 
@@ -206,10 +202,8 @@ def received_start_time(update, context):
                 user_data['info'].remove(str_part_time_table)
         del user_data['edit']
 
-        pr = Process(target=time_table_file.main, args=(user_data, update.message.chat_id))
-        pr.daemon = True
-        pr.start()
-        # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
+        helpers.ProcessManager.run(target=time_table_file.main, args=(user_data, update.message.chat_id))
+        update.message.reply_text('ساختن تصویر برنامه ...')
         return MAIN_CHOOSING
     update.message.reply_text('ساعت پایان؟ (مثلا 13:30) :')
     return FINISH_TIME
@@ -248,10 +242,8 @@ def received_professor(update, context):
     user_data['info'].append('\t'.join(user_data['edit']))
     del user_data['edit']
 
-    pr = Process(target=time_table_file.main, args=(user_data, update.message.chat_id))
-    pr.daemon = True
-    pr.start()
-    # _thread.start_new_thread(time_table_file.main, (user_data, bot, update))
+    helpers.ProcessManager.run(target=time_table_file.main, args=(user_data, update.message.chat_id))
+    update.message.reply_text('ساختن تصویر برنامه ...')
     return MAIN_CHOOSING
 
 
