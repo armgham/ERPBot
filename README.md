@@ -17,3 +17,4 @@ create table CONVERSATIONS (conversation_name VARCHAR(50));
 - [x] find a way for debtor students
 - [x] use requests for web-scrapping
 - [x] memory management while using matplotlib
+- [ ] add_proxy command to use Iran_proxy_server (or pptp vpn).
