@@ -19,7 +19,7 @@ class MyError(ValueError):
         self.args = (err_message, err_code)
 
 
-def main(user_data, chat_id):
+def main(user_data, chat_id, proxy):
     
     try:
         bot = helpers.get_bot()
@@ -34,7 +34,7 @@ def main(user_data, chat_id):
         sent_message = bot.send_message(chat_id=chat_id, text='وارد شدن با یوزرنیم و پسورد ...')
         sent_message = sent_message.message_id
 
-        login_request = requests.post('http://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx', data=data, timeout=10)
+        login_request = requests.post('http://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx', data=data, timeout=15, proxies=proxy)
         dashboard_param_search = re.search(r'\(\"http\:\/\/sada\.guilan\.ac\.ir\/Dashboard\.aspx\?param\=(?P<param>.*?)\"\)', login_request.text)
 
         if dashboard_param_search is None:
@@ -47,7 +47,7 @@ def main(user_data, chat_id):
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='گرفتن فرم تثبیت انتخاب واحد ...')
         
-        report_request = requests.post('http://sada.guilan.ac.ir/Dashboard.aspx', params={'param': dashboard_param}, data={'Command': 'GET_TAB_INFO:020203'}, timeout=10)
+        report_request = requests.post('http://sada.guilan.ac.ir/Dashboard.aspx', params={'param': dashboard_param}, data={'Command': 'GET_TAB_INFO:020203'}, timeout=15, proxies=proxy)
 
         report_param_search = re.search(r'\/Subsystem\/Amozesh\/Sabtenam\/Tasbir\/Report\/Report\.aspx\?param\=(?P<param>.*)', report_request.text)
         if report_param_search is None:
@@ -57,7 +57,7 @@ def main(user_data, chat_id):
                 raise Exception('report_param or debt_message not found', 'rpnf')  # report param not found
         report_param = report_param_search.group('param')
 
-        report_page = requests.get('http://sada.guilan.ac.ir/Subsystem/Amozesh/Sabtenam/Tasbir/Report/Report.aspx', params={'param': report_param}, timeout=10)
+        report_page = requests.get('http://sada.guilan.ac.ir/Subsystem/Amozesh/Sabtenam/Tasbir/Report/Report.aspx', params={'param': report_param}, timeout=15, proxies=proxy)
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج اطلاعات از سایت ...')
 
@@ -135,7 +135,7 @@ def main(user_data, chat_id):
         #import config
         #bot.send_message(chat_id=config.CHAT_ID_OF_ADMIN, text='ارور  ' + str(e.args), reply_markup=markup)
 
-def debtor_main(user_data, chat_id):
+def debtor_main(user_data, chat_id, proxy):
     try:
         bot = helpers.get_bot()
 
@@ -149,7 +149,7 @@ def debtor_main(user_data, chat_id):
         sent_message = bot.send_message(chat_id=chat_id, text='وارد شدن با یوزرنیم و پسورد ...')
         sent_message = sent_message.message_id
 
-        login_request = requests.post('http://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx', data=data, timeout=10)
+        login_request = requests.post('http://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx', data=data, timeout=15, proxies=proxy)
         dashboard_param_search = re.search(r'\(\"http\:\/\/sada\.guilan\.ac\.ir\/Dashboard\.aspx\?param\=(?P<param>.*?)\"\)', login_request.text)
 
         if dashboard_param_search is None:
@@ -162,7 +162,7 @@ def debtor_main(user_data, chat_id):
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='رفتن به قسمت کارنامه ترمی ...')
         
-        workbook_request = requests.post('http://sada.guilan.ac.ir/Dashboard.aspx', params={'param': dashboard_param}, data={'Command': 'GET_TAB_INFO:020205'}, timeout=10)
+        workbook_request = requests.post('http://sada.guilan.ac.ir/Dashboard.aspx', params={'param': dashboard_param}, data={'Command': 'GET_TAB_INFO:020205'}, timeout=15, proxies=proxy)
 
         workbook_param_search = re.search(r'\/Subsystem\/Amozesh\/Stu\/WorkBook\/StdWorkBook_Index\.aspx\?param\=(?P<param>.*)', workbook_request.text)
         if workbook_param_search is None:
@@ -170,13 +170,13 @@ def debtor_main(user_data, chat_id):
         workbook_param = workbook_param_search.group('param')
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='گرفتن فرم انتخاب واحد ترم آخر ...')
-        request_for_last_term = requests.get('http://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, timeout=10)
+        request_for_last_term = requests.get('http://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, timeout=15, proxies=proxy)
         last_term = BeautifulSoup(request_for_last_term.text, 'lxml')
         last_term = last_term.find(id='Term_Drp')
         last_term = last_term.find_all('option')[-1]['value']
 
         data={'SubIs_Chk':'false', 'Command':'Log:Vahed', 'Hitab':'Vahed', 'TypeCard_Drp':'rpGrade_Karname_2', 'mx_grid_info':'0;1;1;1;;;onGridLoad;1;;', 'Term_Drp':last_term}
-        last_term_page = requests.post('http://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, data=data)
+        last_term_page = requests.post('http://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, data=data, timeout=15, proxies=proxy)
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج اطلاعات از سایت ...')
 

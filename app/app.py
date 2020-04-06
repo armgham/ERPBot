@@ -38,6 +38,18 @@ MAIN_CHOOSING, DAY_CHOOSING, EDIT_CHOOSING, USERPASS, \
 
 markup = helpers.markup
 
+def get_proxy():
+    from SqlPersistence import get_database_connection
+    db = get_database_connection(config.MYSQL_HOST, config.MYSQL_USERNAME, config.MYSQL_PASSWORD, config.MYSQL_DB_NAME)
+    with db.cursor() as cur:
+            results = cur.execute('SELECT * FROM PROXY')
+            if results > 0:
+                for proxy_address, in cur.fetchall():
+                    if proxy_address == '':
+                        return None
+                    return {'http': 'socks4://'+proxy_address, 'https': 'socks4://'+proxy_address}
+
+
 def start(update, context):
     update.message.reply_text(
         'سلام! کار من اینه که با استفاده از یوزرنیم و پسورد sada.guilan.ac.ir وارد سامانه بشم'
@@ -67,7 +79,7 @@ def received_userpass(update, context):
     del user_data['choice']
     if 'time_table' in user_data:
         update.message.reply_text('خب الان برنامه رو از سایت میگیرم!')
-        _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id))
+        _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy()))
         del user_data['time_table']
         # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
         return MAIN_CHOOSING
@@ -85,14 +97,14 @@ def time_table_scrp(update, context):
         bot.send_message(chat_id=update.message.chat_id, text='خب {} خودتو بده:'.format('نام کاربری'))
         user_data['choice'] = 'username'
         return USERPASS
-    _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id))
+    _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy()))
     # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
     return MAIN_CHOOSING
 
 
 def time_table_scrp_debtor(update, context):
     user_data = context.user_data
-    _thread.start_new_thread(scrap_requets.debtor_main, (user_data, update.message.chat_id))
+    _thread.start_new_thread(scrap_requets.debtor_main, (user_data, update.message.chat_id, get_proxy()))
     return MAIN_CHOOSING
 
 
@@ -275,6 +287,25 @@ def flush_database(update, context):
     return MAIN_CHOOSING
 
 
+def add_proxy(update, context):
+    if len(context.args) == 1:
+        proxy_address = context.args[0]
+    else:
+        proxy_address = ''
+    from SqlPersistence import get_database_connection
+    db = get_database_connection(config.MYSQL_HOST, config.MYSQL_USERNAME, config.MYSQL_PASSWORD, config.MYSQL_DB_NAME)
+    cur = db.cursor()
+    cur.execute('DROP TABLE IF EXISTS PROXY;')
+    cur.execute('CREATE TABLE PROXY (proxy VARCHAR(50));')
+    db.commit()
+    logger.info('in add proxy : ' + proxy_address)
+    cur.execute('INSERT INTO PROXY VALUES (%s);', (proxy_address, ))
+    db.commit()
+    update.message.reply_text('ok', reply_markup=markup)
+    db.close()
+    return MAIN_CHOOSING
+
+
 def new_start(update, context):
     update.message.reply_text('سلام مجدد دوستان بات آپدیت شده. الان دیگه ویرایش هاتون احتمالا! ذخیره میشه و روند گرفتن برنامه از سایت هم سریعتر شده.', reply_markup=markup)
     return MAIN_CHOOSING
@@ -364,6 +395,7 @@ def main():
             CommandHandler('restart', restart),
             CommandHandler('cancel', cancel),
             CommandHandler('flush', flush_database),
+            CommandHandler('addproxy', add_proxy),
             MessageHandler(Filters.all, unknown),
         ],
         # allow_reentry=True,
