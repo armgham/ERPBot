@@ -122,6 +122,7 @@ def main(user_data, chat_id, proxy):
         error_code = e.args[-1]
         if error_code == 'iup':
             text_message = 'رمز عبور یا نام کاربری اشتباه'
+            markup = helpers.markup
         elif error_code == 'd':
             text_message = 'نیاوردن فرم تثبیت انتخاب واحد بدلیل بدهکار بودن دانشجو' + '\n'
             text_message += 'چون فرم تثبیت کار نکرده از یه راه دیگه میشه رفت الان یه دکمه دیگه اضافه کردم واست اونو میتونی امتحان کنی. منتها امتحانا رو نمیتونم واست لیست کنم.'
@@ -153,7 +154,7 @@ def debtor_main(user_data, chat_id, proxy):
         bot = helpers.get_bot()
 
         retry_strategy = Retry(
-            total=5,
+            total=3,
             status_forcelist=[429, 500, 502, 503, 504],
             method_whitelist=["HEAD", "GET", "PUT", "DELETE", "OPTIONS", "TRACE", "POST"],
             backoff_factor=1,
@@ -194,13 +195,13 @@ def debtor_main(user_data, chat_id, proxy):
         workbook_param = workbook_param_search.group('param')
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='گرفتن فرم انتخاب واحد ترم آخر ...')
-        request_for_last_term = http.get('http://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, timeout=7, proxies=proxy)
+        request_for_last_term = http.get('http://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, timeout=15, proxies=proxy)
         last_term = BeautifulSoup(request_for_last_term.text, 'lxml')
         last_term = last_term.find(id='Term_Drp')
         last_term = last_term.find_all('option')[-1]['value']
 
         data={'SubIs_Chk':'false', 'Command':'Log:Vahed', 'Hitab':'Vahed', 'TypeCard_Drp':'rpGrade_Karname_2', 'mx_grid_info':'0;1;1;1;;;onGridLoad;1;;', 'Term_Drp':last_term}
-        last_term_page = http.post('http://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, data=data, timeout=7, proxies=proxy)
+        last_term_page = http.post('http://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, data=data, timeout=10, proxies=proxy)
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج اطلاعات از سایت ...')
 
