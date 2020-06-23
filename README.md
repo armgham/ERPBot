@@ -19,3 +19,4 @@ create table PROXY (proxy VARCHAR(50));
 - [x] use requests for web-scrapping
 - [x] memory management while using matplotlib
 - [x] add_proxy command to use Iran_proxy_server (or pptp vpn) (to remove proxy use /addproxy without argument).
+- [ ] http to https
