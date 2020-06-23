@@ -50,7 +50,7 @@ def main(user_data, chat_id):
     wait = WebDriverWait(driver, 10)
     try:
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='باز کردن سایت')
-        driver.get("http://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx")
+        driver.get("https://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx")
         if 'sada.guilan.ac.ir/GoToDashboard.aspx' in driver.current_url:
             logger.info('ey baba???????????????????????????')
             driver.find_element_by_class_name('refreshDash').click()
