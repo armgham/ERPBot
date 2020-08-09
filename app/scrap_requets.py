@@ -77,10 +77,12 @@ def main(user_data, chat_id, proxy):
         soup = BeautifulSoup(report_page.text, 'lxml')
         rows = soup.find_all('table', class_='grd')
         del soup, data, login_request, dashboard_param, dashboard_param_search, report_page, report_param_search, report_param, report_request
-
+        time_column_index = -1
         for column_index in range(len(rows[0].find_all('td'))):
             if rows[0].find_all('td')[column_index].find('span').text == 'زمان برگزاري':
                 time_column_index = column_index
+        if time_column_index == -1:
+            raise MyError('table is empty', 'empty')
         rows = rows[1:]
         number_of_rows = 0
         for row_index in range(len(rows)):
@@ -122,6 +124,9 @@ def main(user_data, chat_id, proxy):
         error_code = e.args[-1]
         if error_code == 'iup':
             text_message = 'رمز عبور یا نام کاربری اشتباه'
+            markup = helpers.markup
+        elif error_code == 'empty':
+            text_message = 'جدول این ترم خالیه شاید تو ترم تابستون باشی و واحد نداشته باشی' + '\nمیتونی واسه ترمهای قبل رو بگیری'
             markup = helpers.markup
         elif error_code == 'd':
             text_message = 'نیاوردن فرم تثبیت انتخاب واحد بدلیل بدهکار بودن دانشجو' + '\n'

@@ -22,4 +22,4 @@ create table PROXY (proxy VARCHAR(50));
 - [x] http to https
 - [x] add button to select other terms!
 - [ ] show error of connection to user. (without Iran_proxy or maybe with proxy)
-- [ ] handle 'time_column_index' problem. (when table is empty)
+- [x] handle 'time_column_index' problem. (when table is empty)
