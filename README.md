@@ -20,6 +20,6 @@ create table PROXY (proxy VARCHAR(50));
 - [x] memory management while using matplotlib
 - [x] add_proxy command to use Iran_proxy_server (or pptp vpn) (to remove proxy use /addproxy without argument).
 - [x] http to https
-- [ ] add button to select other terms!
+- [x] add button to select other terms!
 - [ ] show error of connection to user. (without Iran_proxy or maybe with proxy)
 - [ ] handle 'time_column_index' problem. (when table is empty)

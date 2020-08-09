@@ -34,7 +34,7 @@ os.environ["PATH"] += os.pathsep + cwd
 
 #gc.set_threshold(1)
 MAIN_CHOOSING, DAY_CHOOSING, EDIT_CHOOSING, USERPASS, \
-    START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR, CHOOSING_DARS, DATE = range(11)
+    START_TIME, FINISH_TIME, COMMENTS, LESSON, PROFESSOR, CHOOSING_DARS, DATE, INDEX_OF_TERM = range(12)
 
 markup = helpers.markup
 
@@ -104,7 +104,19 @@ def time_table_scrp(update, context):
 
 def time_table_scrp_debtor(update, context):
     user_data = context.user_data
-    _thread.start_new_thread(scrap_requets.debtor_main, (user_data, update.message.chat_id, get_proxy()))
+    text = update.message.text
+    prev = False
+    if text == 'گرفتن برنامه ترمهای قبل':
+        update.message.reply_text('الان لیست ترمها رو واست درمیارم' + '\nفقط ممکنه ترمای خیلی قبل مشکل داشته باشن چون طراحی سایت عوض شده تو این چند سال')
+        prev = True
+        _thread.start_new_thread(scrap_requets.debtor_main, (user_data, update.message.chat_id, get_proxy(), prev))
+        return INDEX_OF_TERM
+    elif text == '👈گرفتن برنامه از یه راه دیگه واسه دانشجوهایی که بدهی دارن':
+        _thread.start_new_thread(scrap_requets.debtor_main, (user_data, update.message.chat_id, get_proxy()))
+    else:
+        import re
+        n = re.search(r'(?P<index_of_term>\d+) \: .*$', text).group('index_of_term')
+        _thread.start_new_thread(scrap_requets.debtor_main, (user_data, update.message.chat_id, get_proxy(), True, int(n)))
     return MAIN_CHOOSING
 
 
@@ -344,6 +356,7 @@ def main():
                 MessageHandler(Filters.regex('^گرفتن برنامه ویرایش شده$'), time_table),
                 MessageHandler(Filters.regex('^گرفتن برنامه از یه راه دیگه$'), time_table_scrp_selenium),
                 MessageHandler(Filters.regex('^👈گرفتن برنامه از یه راه دیگه واسه دانشجوهایی که بدهی دارن$'), time_table_scrp_debtor),
+                MessageHandler(Filters.regex('^گرفتن برنامه ترمهای قبل$'), time_table_scrp_debtor),
             ],
     
             DAY_CHOOSING: [
@@ -387,6 +400,10 @@ def main():
 
             PROFESSOR: [
                 MessageHandler(Filters.text, received_professor),
+            ],
+            INDEX_OF_TERM: [
+                MessageHandler(Filters.regex(r'^\d+ \: .*$'), time_table_scrp_debtor),
+                #MessageHandler(Filters.text, time_table_scrp_debtor),
             ],
         },
 

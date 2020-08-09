@@ -149,7 +149,7 @@ def main(user_data, chat_id, proxy):
         #import config
         #bot.send_message(chat_id=config.CHAT_ID_OF_ADMIN, text='ارور  ' + str(e.args), reply_markup=markup)
 
-def debtor_main(user_data, chat_id, proxy):
+def debtor_main(user_data, chat_id, proxy, prev_term=False, number_of_term=-1):
     try:
         bot = helpers.get_bot()
 
@@ -194,22 +194,40 @@ def debtor_main(user_data, chat_id, proxy):
             raise Exception('workbook_param not found', 'wpnf')  # workbook param not found
         workbook_param = workbook_param_search.group('param')
 
-        bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='گرفتن فرم انتخاب واحد ترم آخر ...')
-        request_for_last_term = http.get('https://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, timeout=15, proxies=proxy)
-        last_term = BeautifulSoup(request_for_last_term.text, 'lxml')
-        last_term = last_term.find(id='Term_Drp')
-        last_term = last_term.find_all('option')[-1]['value']
+        bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='گرفتن فرم انتخاب واحد ترم ' + ('موردنظر' if prev_term else 'آخر') + ' ...')
+        request_for_term = http.get('https://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, timeout=15, proxies=proxy)
+        all_terms = BeautifulSoup(request_for_term.text, 'lxml')
+        all_terms = all_terms.find(id='Term_Drp')
+        if not prev_term:
+            term = all_terms.find_all('option')[-1]['value']
+        else:
+            if number_of_term != -1:
+                term = all_terms.find_all('option')[number_of_term]['value']
+            else:
+                from telegram import ReplyKeyboardMarkup
 
-        data={'SubIs_Chk':'false', 'Command':'Log:Vahed', 'Hitab':'Vahed', 'TypeCard_Drp':'rpGrade_Karname_2', 'mx_grid_info':'0;1;1;1;;;onGridLoad;1;;', 'Term_Drp':last_term}
-        last_term_page = http.post('https://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, data=data, timeout=10, proxies=proxy)
+                terms_keyboard = []
+                for term_index, term_str in enumerate(all_terms.find_all('option')[1:-1]):
+                    terms_keyboard.append([str(term_index+1) + ' : ' + term_str.text])
+                terms_markup = ReplyKeyboardMarkup(terms_keyboard, one_time_keyboard=True)
+                bot.send_message(chat_id=chat_id, text='برنامه کدوم ترم:؟',
+                                        reply_markup=terms_markup)
+                return 11 # break
+                #from telegram import ReplyKeyboardMarkup
+                #new_markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+                #bot.send_message(chat_id=chat_id, text='یه دکمه دیگه هم اضافه کردم :میتونی از یه راه دیگه هم تست کنی', reply_markup=new_markup)
+                #print('befrest vasash termharo')
+
+        data={'SubIs_Chk':'false', 'Command':'Log:Vahed', 'Hitab':'Vahed', 'TypeCard_Drp':'rpGrade_Karname_2', 'mx_grid_info':'0;1;1;1;;;onGridLoad;1;;', 'Term_Drp':term}
+        term_page = http.post('https://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, data=data, timeout=10, proxies=proxy)
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج اطلاعات از سایت ...')
 
-        soup = BeautifulSoup(last_term_page.text, 'lxml')
+        soup = BeautifulSoup(term_page.text, 'lxml')
         
 
         tables = soup.find_all('table')
-        del soup, data, login_request, dashboard_param, dashboard_param_search, workbook_request, workbook_param_search, workbook_param, request_for_last_term, last_term_page
+        del soup, data, login_request, dashboard_param, dashboard_param_search, workbook_request, workbook_param_search, workbook_param, request_for_term, term_page
 
         user_data['first_info'] = []
         user_data['midterm'] = []
@@ -220,7 +238,7 @@ def debtor_main(user_data, chat_id, proxy):
                 time_column_index = column_index
         table = tables[-1]
         rows = table.find_all('tr')
-        for row_index, row in enumerate(rows):
+        for _, row in enumerate(rows):
             parts_of_row = row.find_all('td')
             user_data['first_info'].append(
                 parts_of_row[time_column_index].text + '\t\t\t' + parts_of_row[1].text +
@@ -243,4 +261,7 @@ def debtor_main(user_data, chat_id, proxy):
     except Exception as e:
         logger.info(str(user_data['username'] + '  ||  ' + user_data['password']) + '  debtor exception!!!!!!')
         logger.warning(str(e.args))
-        bot.send_message(chat_id=chat_id, text='بازم ارور🤦‍♂️' + ' نمیدونم مشکل چیه. میتونی دوباره تست کنی اگه بازم درست نشد به این آیدی یه پیغام بفرست: @ArmanG98 🙏', reply_markup=markup)
+        if not prev_term:
+            bot.send_message(chat_id=chat_id, text='بازم ارور🤦‍♂️' + ' نمیدونم مشکل چیه. میتونی دوباره تست کنی اگه بازم درست نشد به این آیدی یه پیغام بفرست: @ArmanG98 🙏', reply_markup=markup)
+        else:
+            bot.send_message(chat_id=chat_id, text=' نمیدونم مشکل چیه. میتونی دوباره تست کنی اگه بازم درست نشد به این آیدی یه پیغام بفرست: @ArmanG98 🙏', reply_markup=markup)

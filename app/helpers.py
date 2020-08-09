@@ -7,6 +7,7 @@ import config
 
 reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (username, password)'],
                   ['گرفتن برنامه از سایت'],
+                  ['گرفتن برنامه ترمهای قبل'],
                   ['ویرایش برنامه', 'گرفتن برنامه ویرایش شده']]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
