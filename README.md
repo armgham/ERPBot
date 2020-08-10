@@ -22,10 +22,10 @@ address of bot: https://telegram.me/guilan_sada_bot
 
 If You're On A Windows Machine , Make Environment Ready By Following Steps Below:
 1. Install `python`(3), `pip`, `virtualenv`, MySQL, [phantomjs](https://phantomjs.org/quick-start.html) (add it to path variable).
-2. Clone the project using:  `git clone https://github.com/engiAsadi/IE-GalleryProject`.
+2. Clone the project using:  `git clone https://github.com/armgham/ERPBot`.
 3. Make Environment Ready Like This:
 ``` Command Prompt
-cd IE-GalleryProject
+cd ERPBot
 virutalenv -p "PATH\TO\Python.exe" build # Give Full Path To python.exe
 build\Scripts\activate # Activate The Virutal Environment
 pip install -r requirements.txt
