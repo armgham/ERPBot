@@ -4,6 +4,7 @@ from requests.packages.urllib3.util.retry import Retry
 import re
 from bs4 import BeautifulSoup
 import gc
+from requests.exceptions import ConnectionError
 
 from multiprocessing import Process
 import text_process
@@ -138,6 +139,15 @@ def main(user_data, chat_id, proxy):
             markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
         bot.send_message(chat_id=chat_id, text='خب به ارور رسیدیم! : ' + text_message, reply_markup=markup)
 
+    except ConnectionError as e:
+        logger.info(str(user_data['username'] + '  ||  ' + user_data['password']))
+        logger.warning(str(e.args))
+        logger.warning('CONECTION PROBLEM (WITH PROXY or maybe WITHOUT PROXY)')
+        bot.send_message(chat_id=chat_id, text='مشکل در ارتباط با سایت!!! شاید سایت خراب باشه یا شاید بازم سایت رو یه کاری کردن فقط با آیپی ایران بشه رفت و سرور این ربات هم خارج از ایرانه.' +
+                                                ' اگه پراکسی ساکس۴ ایران داری ممنون میشم واسه این آیدی بفرستیش' + ': @ArmanG98\n' + 'میتونی دوباره تست کنی. اگه سایت اوکی بود و بازم همین' +
+                                                ' ارور رو دیدی چند ساعت دیگه دوباره امتحان کن. ', reply_markup=helpers.markup)
+        from config import CHAT_ID_OF_ADMIN
+        bot.send_message(chat_id=CHAT_ID_OF_ADMIN, text='', reply_markup=helpers.markup)
 
     except Exception as e:
         logger.info(str(user_data['username'] + '  ||  ' + user_data['password']))
@@ -263,6 +273,16 @@ def debtor_main(user_data, chat_id, proxy, prev_term=False, number_of_term=-1):
             text_message = 'رمز عبور یا نام کاربری اشتباه'
         bot.send_message(chat_id=chat_id, text='خب به ارور رسیدیم! : ' + text_message, reply_markup=markup)
 
+    except ConnectionError as e:
+        logger.info(str(user_data['username'] + '  ||  ' + user_data['password']))
+        logger.warning(str(e.args))
+        logger.warning('CONECTION PROBLEM (WITH PROXY or maybe WITHOUT PROXY)')
+        bot.send_message(chat_id=chat_id, text='مشکل در ارتباط با سایت!!! شاید سایت خراب باشه یا شاید بازم سایت رو یه کاری کردن فقط با آیپی ایران بشه رفت و سرور این ربات هم خارج از ایرانه.' +
+                                                ' اگه پراکسی ساکس۴ ایران داری ممنون میشم واسه این آیدی بفرستیش' + ': @ArmanG98\n' + 'میتونی دوباره تست کنی. اگه سایت اوکی بود و بازم همین' +
+                                                ' ارور رو دیدی چند ساعت دیگه دوباره امتحان کن. ', reply_markup=helpers.markup)
+        from config import CHAT_ID_OF_ADMIN
+        bot.send_message(chat_id=CHAT_ID_OF_ADMIN, text='', reply_markup=helpers.markup)
+        
     except Exception as e:
         logger.info(str(user_data['username'] + '  ||  ' + user_data['password']) + '  debtor exception!!!!!!')
         logger.warning(str(e.args))
