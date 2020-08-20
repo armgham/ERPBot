@@ -68,3 +68,5 @@ create table PROXY (proxy VARCHAR(50));
 - [x] add button to select other terms!
 - [x] show error of connection to user. (without Iran_proxy:[x] or maybe with proxy:[ ])
 - [x] handle 'time_column_index' problem. (when table is empty)
+- [x] show error of evalution
+- [x] add a feature to fill evalList

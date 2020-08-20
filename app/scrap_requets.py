@@ -67,7 +67,10 @@ def main(user_data, chat_id, proxy):
         if report_param_search is None:
             if report_request.text.find('بدهکار') >= 0:
                 raise MyError('report problem because of debt', 'd')  # debt
+            elif 'eval' in report_request.text.lower():
+                raise MyError('report problem because of evallist', 'eval')  # evalList
             else:
+                logger.info(report_request.text)
                 raise Exception('report_param or debt_message not found', 'rpnf')  # report param not found
         report_param = report_param_search.group('param')
 
@@ -137,6 +140,10 @@ def main(user_data, chat_id, proxy):
             reply_keyboard[1].append('👈گرفتن برنامه از یه راه دیگه واسه دانشجوهایی که بدهی دارن')
             from telegram import ReplyKeyboardMarkup
             markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+        elif error_code == 'eval':
+            text_message = 'مثل اینکه باید فرم ارزیابی اساتید رو پر کنی.' + '\n'
+            text_message += 'اگه حال نداری همه‌ی سوالای ارزشیابی رو جواب بدی میتونی از دکمه پیچوندن فرم ارزیابی استفاده کنی!'
+            markup = helpers.markup
         bot.send_message(chat_id=chat_id, text='خب به ارور رسیدیم! : ' + text_message, reply_markup=markup)
 
     except ConnectionError as e:

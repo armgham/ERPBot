@@ -7,9 +7,20 @@ import config
 
 reply_keyboard = [['فرستادن نام کاربری و کلمه عبور (username, password)'],
                   ['گرفتن برنامه از سایت'],
-                  ['گرفتن برنامه ترمهای قبل'],
+                  ['گرفتن برنامه ترمهای قبل', '💥پیچوندن فرم ارزیابی'],
                   ['ویرایش برنامه', 'گرفتن برنامه ویرایش شده']]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+
+score_reply_keyboard = [['20'],
+                        ['19'],
+                        ['18'],
+                        ['17'],
+                        ['16'],
+                        ['15'],
+                        ['14'],
+                        ['13'],
+                        ['12']]
+score_markup = ReplyKeyboardMarkup(score_reply_keyboard, one_time_keyboard=True)
 
 
 def get_bot():

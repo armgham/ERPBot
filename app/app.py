@@ -123,6 +123,29 @@ def time_table_scrp_debtor(update, context):
     return MAIN_CHOOSING
 
 
+def eval_scrp(update, context):
+    user_data = context.user_data
+    if 'username' not in user_data:
+        update.message.reply_text('اول باید نام کاربری و کلمه عبور رو بفرستی!', reply_markup=markup)
+        return MAIN_CHOOSING
+    update.message.reply_text('کاری که میکنم اینه که اسم استاد و درس رو بهت میگم و نمرش رو ازت میپرسم ۲۰ ثانیه وقت داری جواب بدی حالا این نمره رو به همه‌ی سوالا میدم فقط یکی از سوالا رو جواب متفاوت میدم که نظرت تو سیستم سایت ذخیره بشه چون اگه همه‌ی جوابا یه نمره باشه نظرت رو پاک میکنن!')
+
+    user_data['nomre'] = -1
+    import eval_scrp_requests
+    _thread.start_new_thread(eval_scrp_requests.main, (user_data, update.message.chat_id, get_proxy()))
+    # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
+    return MAIN_CHOOSING
+
+
+def received_nomre(update, context):
+    user_data = context.user_data
+    nomre = update.message.text
+    nomre = 20 - int(nomre)
+    user_data['nomre'] = nomre
+
+    return MAIN_CHOOSING
+
+
 def time_table_scrp_selenium(update, context):
     user_data = context.user_data
     _thread.start_new_thread(scrp.main, (user_data, update.message.chat_id))
@@ -361,6 +384,8 @@ def main():
                 MessageHandler(Filters.regex('^👈گرفتن برنامه از یه راه دیگه واسه دانشجوهایی که بدهی دارن$'), time_table_scrp_debtor),
                 MessageHandler(Filters.regex('^گرفتن برنامه ترمهای قبل$'), time_table_scrp_debtor),
                 MessageHandler(Filters.regex(r'^\d+ \: .*$'), time_table_scrp_debtor),
+                MessageHandler(Filters.regex('12|13|14|20|12|15|16|17|18|19|20'), received_nomre),
+                MessageHandler(Filters.regex('^💥پیچوندن فرم ارزیابی$'), eval_scrp),
             ],
     
             DAY_CHOOSING: [
