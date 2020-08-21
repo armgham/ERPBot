@@ -229,7 +229,7 @@ def debtor_main(user_data, chat_id, proxy, prev_term=False, number_of_term=-1):
                 from telegram import ReplyKeyboardMarkup
 
                 terms_keyboard = []
-                for term_index, term_str in enumerate(all_terms.find_all('option')[1:-1]):
+                for term_index, term_str in enumerate(all_terms.find_all('option')[1:]):
                     terms_keyboard.append([str(term_index+1) + ' : ' + term_str.text])
                 terms_markup = ReplyKeyboardMarkup(terms_keyboard, one_time_keyboard=True)
                 bot.send_message(chat_id=chat_id, text='برنامه کدوم ترم:؟',
