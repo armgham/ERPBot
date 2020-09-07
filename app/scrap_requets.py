@@ -22,7 +22,7 @@ class MyError(ValueError):
         self.args = (err_message, err_code)
 
 
-def main(user_data, chat_id, proxy):
+def main(user_data, chat_id, proxy, protocol='s'):
     
     try:
         bot = helpers.get_bot()
@@ -48,20 +48,21 @@ def main(user_data, chat_id, proxy):
         sent_message = bot.send_message(chat_id=chat_id, text='وارد شدن با یوزرنیم و پسورد ...')
         sent_message = sent_message.message_id
 
-        login_request = http.post('https://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx', data=data, timeout=7, proxies=proxy)
-        dashboard_param_search = re.search(r'\(\"https\:\/\/sada\.guilan\.ac\.ir\/Dashboard\.aspx\?param\=(?P<param>.*?)\"\)', login_request.text)
+        login_request = http.post('http'+protocol+'://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx', data=data, timeout=7, proxies=proxy)
+        dashboard_param_search = re.search(r'\(\"http'+protocol+r'\:\/\/sada\.guilan\.ac\.ir\/Dashboard\.aspx\?param\=(?P<param>.*?)\"\)', login_request.text)
 
         if dashboard_param_search is None:
             if login_request.text.find('رمز عبور شما اشتباه ميباشد') >= 0 or login_request.text.find('نام کاربري يا کلمه عبور شما اشتباه ميباشد') >= 0:
                 raise MyError('incorrect password_or_username', 'iup')  # incorrect username password
             else:
+                logger.info(login_request.text)
                 raise Exception('dashbord_param or incorrect_password_or_username_message not found', 'dpnf')  # dashbord param not found
 
         dashboard_param = dashboard_param_search.group('param')
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='گرفتن فرم تثبیت انتخاب واحد ...')
         
-        report_request = http.post('https://sada.guilan.ac.ir/Dashboard.aspx', params={'param': dashboard_param}, data={'Command': 'GET_TAB_INFO:020203'}, timeout=7, proxies=proxy)
+        report_request = http.post('http'+protocol+'://sada.guilan.ac.ir/Dashboard.aspx', params={'param': dashboard_param}, data={'Command': 'GET_TAB_INFO:020203'}, timeout=7, proxies=proxy)
 
         report_param_search = re.search(r'\/Subsystem\/Amozesh\/Sabtenam\/Tasbir\/Report\/Report\.aspx\?param\=(?P<param>.*)', report_request.text)
         if report_param_search is None:
@@ -74,7 +75,7 @@ def main(user_data, chat_id, proxy):
                 raise Exception('report_param or debt_message not found', 'rpnf')  # report param not found
         report_param = report_param_search.group('param')
 
-        report_page = http.get('https://sada.guilan.ac.ir/Subsystem/Amozesh/Sabtenam/Tasbir/Report/Report.aspx', params={'param': report_param}, timeout=7, proxies=proxy)
+        report_page = http.get('http'+protocol+'://sada.guilan.ac.ir/Subsystem/Amozesh/Sabtenam/Tasbir/Report/Report.aspx', params={'param': report_param}, timeout=7, proxies=proxy)
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج اطلاعات از سایت ...')
 
@@ -171,7 +172,7 @@ def main(user_data, chat_id, proxy):
         #import config
         #bot.send_message(chat_id=config.CHAT_ID_OF_ADMIN, text='ارور  ' + str(e.args), reply_markup=markup)
 
-def debtor_main(user_data, chat_id, proxy, prev_term=False, number_of_term=-1):
+def debtor_main(user_data, chat_id, proxy, protocol='s', prev_term=False, number_of_term=-1):
     try:
         bot = helpers.get_bot()
 
@@ -196,20 +197,21 @@ def debtor_main(user_data, chat_id, proxy, prev_term=False, number_of_term=-1):
         sent_message = bot.send_message(chat_id=chat_id, text='وارد شدن با یوزرنیم و پسورد ...')
         sent_message = sent_message.message_id
 
-        login_request = http.post('https://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx', data=data, timeout=7, proxies=proxy)
-        dashboard_param_search = re.search(r'\(\"https\:\/\/sada\.guilan\.ac\.ir\/Dashboard\.aspx\?param\=(?P<param>.*?)\"\)', login_request.text)
+        login_request = http.post('http'+protocol+'://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx', data=data, timeout=7, proxies=proxy)
+        dashboard_param_search = re.search(r'\(\"http'+protocol+r'\:\/\/sada\.guilan\.ac\.ir\/Dashboard\.aspx\?param\=(?P<param>.*?)\"\)', login_request.text)
 
         if dashboard_param_search is None:
             if login_request.text.find('رمز عبور شما اشتباه ميباشد') >= 0 or login_request.text.find('نام کاربري يا کلمه عبور شما اشتباه ميباشد') >= 0:
                 raise MyError('incorrect password_or_username', 'iup')  # incorrect username password
             else:
+                logger.info(login_request.text)
                 raise Exception('dashbord_param or incorrect_password_or_username_message not found', 'dpnf')  # dashbord param not found
 
         dashboard_param = dashboard_param_search.group('param')
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='رفتن به قسمت کارنامه ترمی ...')
         
-        workbook_request = http.post('https://sada.guilan.ac.ir/Dashboard.aspx', params={'param': dashboard_param}, data={'Command': 'GET_TAB_INFO:020205'}, timeout=7, proxies=proxy)
+        workbook_request = http.post('http'+protocol+'://sada.guilan.ac.ir/Dashboard.aspx', params={'param': dashboard_param}, data={'Command': 'GET_TAB_INFO:020205'}, timeout=7, proxies=proxy)
 
         workbook_param_search = re.search(r'\/Subsystem\/Amozesh\/Stu\/WorkBook\/StdWorkBook_Index\.aspx\?param\=(?P<param>.*)', workbook_request.text)
         if workbook_param_search is None:
@@ -217,7 +219,7 @@ def debtor_main(user_data, chat_id, proxy, prev_term=False, number_of_term=-1):
         workbook_param = workbook_param_search.group('param')
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='گرفتن فرم انتخاب واحد ترم ' + ('موردنظر' if prev_term else 'آخر') + ' ...')
-        request_for_term = http.get('https://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, timeout=15, proxies=proxy)
+        request_for_term = http.get('http'+protocol+'://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, timeout=15, proxies=proxy)
         all_terms = BeautifulSoup(request_for_term.text, 'lxml')
         all_terms = all_terms.find(id='Term_Drp')
         if not prev_term:
@@ -241,7 +243,7 @@ def debtor_main(user_data, chat_id, proxy, prev_term=False, number_of_term=-1):
                 #print('befrest vasash termharo')
 
         data={'SubIs_Chk':'false', 'Command':'Log:Vahed', 'Hitab':'Vahed', 'TypeCard_Drp':'rpGrade_Karname_2', 'mx_grid_info':'0;1;1;1;;;onGridLoad;1;;', 'Term_Drp':term}
-        term_page = http.post('https://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, data=data, timeout=10, proxies=proxy)
+        term_page = http.post('http'+protocol+'://sada.guilan.ac.ir/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx', params={'param': workbook_param}, data=data, timeout=10, proxies=proxy)
 
         bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج اطلاعات از سایت ...')
 

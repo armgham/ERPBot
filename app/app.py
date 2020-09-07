@@ -48,7 +48,14 @@ def get_proxy():
                     if proxy_address == '':
                         return None
                     return {'http': 'socks4://'+proxy_address, 'https': 'socks4://'+proxy_address}
-
+def get_protocol():
+    from SqlPersistence import get_database_connection
+    db = get_database_connection(config.MYSQL_HOST, config.MYSQL_USERNAME, config.MYSQL_PASSWORD, config.MYSQL_DB_NAME)
+    with db.cursor() as cur:
+            results = cur.execute('SELECT * FROM PROTOCOL')
+            if results > 0:
+                for protocol, in cur.fetchall():
+                    return protocol
 
 def start(update, context):
     update.message.reply_text(
@@ -79,7 +86,7 @@ def received_userpass(update, context):
     del user_data['choice']
     if 'time_table' in user_data:
         update.message.reply_text('خب الان برنامه رو از سایت میگیرم!')
-        _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy()))
+        _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy(), get_protocol()))
         del user_data['time_table']
         # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
         return MAIN_CHOOSING
@@ -97,7 +104,7 @@ def time_table_scrp(update, context):
         bot.send_message(chat_id=update.message.chat_id, text='خب {} خودتو بده:'.format('نام کاربری'))
         user_data['choice'] = 'username'
         return USERPASS
-    _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy()))
+    _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy(), get_protocol()))
     # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
     return MAIN_CHOOSING
 
@@ -119,7 +126,7 @@ def time_table_scrp_debtor(update, context):
         n = re.search(r'(?P<index_of_term>\d+) \: .*$', text).group('index_of_term')
         term_n = int(n)
         prev = True
-    _thread.start_new_thread(scrap_requets.debtor_main, (user_data, update.message.chat_id, get_proxy(), prev, term_n))
+    _thread.start_new_thread(scrap_requets.debtor_main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), prev, term_n))
     return MAIN_CHOOSING
 
 
@@ -132,7 +139,7 @@ def eval_scrp(update, context):
 
     user_data['nomre'] = -1
     import eval_scrp_requests
-    _thread.start_new_thread(eval_scrp_requests.main, (user_data, update.message.chat_id, get_proxy()))
+    _thread.start_new_thread(eval_scrp_requests.main, (user_data, update.message.chat_id, get_proxy(), get_protocol()))
     # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
     return MAIN_CHOOSING
 
@@ -326,8 +333,10 @@ def flush_database(update, context):
 
 
 def add_proxy(update, context):
+    logger.info(context.args)
     if len(context.args) == 1:
         proxy_address = context.args[0]
+        logger.info(proxy_address)
     else:
         proxy_address = ''
     from SqlPersistence import get_database_connection
@@ -338,6 +347,27 @@ def add_proxy(update, context):
     db.commit()
     logger.info('in add proxy : ' + proxy_address)
     cur.execute('INSERT INTO PROXY VALUES (%s);', (proxy_address, ))
+    db.commit()
+    update.message.reply_text('ok', reply_markup=markup)
+    db.close()
+    return MAIN_CHOOSING
+
+def switch_protocol(update, context):
+    """ 's' for https and '' for http"""
+    logger.info(context.args)
+    if len(context.args) == 1:
+        protocol = 's'
+        logger.info(protocol)
+    else:
+        protocol = ''
+    from SqlPersistence import get_database_connection
+    db = get_database_connection(config.MYSQL_HOST, config.MYSQL_USERNAME, config.MYSQL_PASSWORD, config.MYSQL_DB_NAME)
+    cur = db.cursor()
+    cur.execute('DROP TABLE IF EXISTS PROTOCOL;')
+    cur.execute('CREATE TABLE PROTOCOL (protocol VARCHAR(50));')
+    db.commit()
+    logger.info('in add PROTOCOL : ' + protocol)
+    cur.execute('INSERT INTO PROTOCOL VALUES (%s);', (protocol, ))
     db.commit()
     update.message.reply_text('ok', reply_markup=markup)
     db.close()
@@ -438,6 +468,7 @@ def main():
             CommandHandler('cancel', cancel),
             CommandHandler('flush', flush_database),
             CommandHandler('addproxy', add_proxy),
+            CommandHandler('sp', switch_protocol),
             MessageHandler(Filters.all, unknown),
         ],
         # allow_reentry=True,

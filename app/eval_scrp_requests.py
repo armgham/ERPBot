@@ -21,7 +21,7 @@ class MyError(ValueError):
         self.args = (err_message, err_code)
 
 
-def main(user_data, chat_id, proxy):
+def main(user_data, chat_id, proxy, protocol='s'):
     markup = helpers.markup
     score_markup = helpers.score_markup
     
@@ -49,8 +49,8 @@ def main(user_data, chat_id, proxy):
         sent_message = bot.send_message(chat_id=chat_id, text='وارد شدن با یوزرنیم و پسورد ...')
         sent_message = sent_message.message_id
 
-        login_request = http.post('https://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx', data=data, timeout=7, proxies=proxy)
-        dashboard_param_search = re.search(r'\(\"https\:\/\/sada\.guilan\.ac\.ir\/Dashboard\.aspx\?param\=(?P<param>.*?)\"\)', login_request.text)
+        login_request = http.post('http'+protocol+'://sada.guilan.ac.ir/SubSystem/Edari/PRelate/Site/SignIn.aspx', data=data, timeout=7, proxies=proxy)
+        dashboard_param_search = re.search(r'\(\"http'+protocol+r'\:\/\/sada\.guilan\.ac\.ir\/Dashboard\.aspx\?param\=(?P<param>.*?)\"\)', login_request.text)
 
         if dashboard_param_search is None:
             if login_request.text.find('رمز عبور شما اشتباه ميباشد') >= 0 or login_request.text.find('نام کاربري يا کلمه عبور شما اشتباه ميباشد') >= 0:
@@ -76,7 +76,7 @@ def main(user_data, chat_id, proxy):
                 evalList_param_search =  re.search(r'\/SubSystem\/Amozesh\/Eval\/List\/EvalList\.aspx\?param\=(?P<param>.*)', report_request.text)
                 evalList_param = evalList_param_search.group('param')
 
-                evalList_page = http.get('https://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/List/EvalList.aspx', params={'param': evalList_param}, timeout=7, proxies=proxy)
+                evalList_page = http.get('http'+protocol+'://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/List/EvalList.aspx', params={'param': evalList_param}, timeout=7, proxies=proxy)
 
                 bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج لیست ارزشیابی‌ها ...')
                 
@@ -87,9 +87,9 @@ def main(user_data, chat_id, proxy):
                     
                     Command_data = 'AnswerSubject♥' + eval_elem.find_all('td')[0].text + '♥' + eval_elem.find_all('td')[3].text
                     
-                    eval_request = http.post('https://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/List/EvalList.aspx', params={'param': evalList_param}, data={'Command': Command_data}, timeout=7, proxies=proxy)
+                    eval_request = http.post('http'+protocol+'://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/List/EvalList.aspx', params={'param': evalList_param}, data={'Command': Command_data}, timeout=7, proxies=proxy)
                     eval_param = eval_request.text
-                    eval_page = http.get('https://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/Answer/Subject/EvalAnswerSubject.aspx', params={'param': eval_param}, timeout=7, proxies=proxy)
+                    eval_page = http.get('http'+protocol+'://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/Answer/Subject/EvalAnswerSubject.aspx', params={'param': eval_param}, timeout=7, proxies=proxy)
                     
                     bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج لیست استادها ...')
 
@@ -101,9 +101,9 @@ def main(user_data, chat_id, proxy):
                         Command_data = 'Answer♥' + professor_elem.find_all('td')[0].text + '♥' + professor_elem.find_all('td')[1].text + '♥' + professor_elem.find_all('td')[2].text +\
                                         '♥' + professor_elem.find_all('td')[3].text + '♥' + professor_elem.find_all('td')[4].text + '♥' + professor_elem.find_all('td')[7].text
                         
-                        professor_request = http.post('https://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/Answer/Subject/EvalAnswerSubject.aspx', params={'param': eval_param}, data={'Command': Command_data}, timeout=7, proxies=proxy)
+                        professor_request = http.post('http'+protocol+'://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/Answer/Subject/EvalAnswerSubject.aspx', params={'param': eval_param}, data={'Command': Command_data}, timeout=7, proxies=proxy)
                         questions_param = professor_request.text
-                        questions_page = http.get('https://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/Answer/ListItems.aspx', params={'param': questions_param}, timeout=7, proxies=proxy)
+                        questions_page = http.get('http'+protocol+'://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/Answer/ListItems.aspx', params={'param': questions_param}, timeout=7, proxies=proxy)
                         bot.send_message(chat_id=chat_id, text=professor_elem.find_all('td')[7].text + '    ' + professor_elem.find_all('td')[8].text + '\n نمره رو بزن:' , reply_markup=score_markup)
                         timer = 0
                         while timer <= 20:
@@ -144,7 +144,7 @@ def main(user_data, chat_id, proxy):
                         x += ':'
                         post_data['Command'] = x
                         logger.info('EVALLLLLLLL  '+str(post_data))
-                        professor_eval_request = http.post('https://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/Answer/ListItems.aspx', params={'param': questions_param}, data=post_data, timeout=7, proxies=proxy)
+                        professor_eval_request = http.post('http'+protocol+'://sada.guilan.ac.ir/SubSystem/Amozesh/Eval/Answer/ListItems.aspx', params={'param': questions_param}, data=post_data, timeout=7, proxies=proxy)
                         if 'ok' in professor_eval_request.text.lower():
                             professor_list.pop()
                         else:

@@ -70,3 +70,4 @@ create table PROXY (proxy VARCHAR(50));
 - [x] handle 'time_column_index' problem. (when table is empty)
 - [x] show error of evalution
 - [x] add a feature to fill evalList
+- [x] add a feature to switch between http and https(https: /sp s, http: /sw)
