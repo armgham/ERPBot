@@ -56,7 +56,6 @@ create table PROXY (proxy VARCHAR(50));
 
 - [x] flush command handler
 - [x] fix bugs! (when press get the edited table first time, ...)
-- [x] a function to give telegram bot connection for other modules to send message ...
 - [x] make phantomjs lighter and faster
 - [x] send logs to users.
 - [x] handle urllib3.connection.HTTPConnection(urllib3.exceptions.ProtocolError) error
@@ -64,10 +63,9 @@ create table PROXY (proxy VARCHAR(50));
 - [x] use requests for web-scrapping
 - [x] memory management while using matplotlib
 - [x] add_proxy command to use Iran_proxy_server (or pptp vpn) (to remove proxy use /addproxy without argument).
-- [x] http to https
 - [x] add button to select other terms!
 - [x] show error of connection to user. (without Iran_proxy:[x] or maybe with proxy:[ ])
 - [x] handle 'time_column_index' problem. (when table is empty)
 - [x] show error of evalution
 - [x] add a feature to fill evalList
-- [x] add a feature to switch between http and https(https: /sp s, http: /sw)
+- [x] add a command to switch between http and https(https: /sp s, http: /sw)

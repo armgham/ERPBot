@@ -2,12 +2,14 @@
 from telegram import ReplyKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler)
-import scrp
+# import scrp
 import _thread
-import time_table_file
 import re
 import gc
+
 import config
+import time_table_file
+import scrap_requets
 import helpers
 from multiprocessing import Process
 from SqlPersistence import SqlPersistence
@@ -16,9 +18,6 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-
-
-import scrap_requets
 
 '''
 import os 47
@@ -86,7 +85,7 @@ def received_userpass(update, context):
     del user_data['choice']
     if 'time_table' in user_data:
         update.message.reply_text('خب الان برنامه رو از سایت میگیرم!')
-        _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy(), get_protocol()))
+        _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), 'report', False, -1))
         del user_data['time_table']
         # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
         return MAIN_CHOOSING
@@ -104,7 +103,7 @@ def time_table_scrp(update, context):
         bot.send_message(chat_id=update.message.chat_id, text='خب {} خودتو بده:'.format('نام کاربری'))
         user_data['choice'] = 'username'
         return USERPASS
-    _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy(), get_protocol()))
+    _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), 'report', False, -1))
     # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
     return MAIN_CHOOSING
 
@@ -126,7 +125,7 @@ def time_table_scrp_debtor(update, context):
         n = re.search(r'(?P<index_of_term>\d+) \: .*$', text).group('index_of_term')
         term_n = int(n)
         prev = True
-    _thread.start_new_thread(scrap_requets.debtor_main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), prev, term_n))
+    _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), 'workbook', prev, term_n))
     return MAIN_CHOOSING
 
 
@@ -153,11 +152,11 @@ def received_nomre(update, context):
     return MAIN_CHOOSING
 
 
-def time_table_scrp_selenium(update, context):
-    user_data = context.user_data
-    _thread.start_new_thread(scrp.main, (user_data, update.message.chat_id))
-    update.message.reply_text('الان از یه روش دیگه میرم این یکی یه ذره طول میکشه!')
-    return MAIN_CHOOSING
+# def time_table_scrp_selenium(update, context):
+#     user_data = context.user_data
+#     _thread.start_new_thread(scrp.main, (user_data, update.message.chat_id))
+#     update.message.reply_text('الان از یه روش دیگه میرم این یکی یه ذره طول میکشه!')
+#     return MAIN_CHOOSING
 
 
 def time_table(update, context):
@@ -410,7 +409,7 @@ def main():
                 MessageHandler(Filters.regex('^گرفتن برنامه از سایت$'), time_table_scrp),
                 MessageHandler(Filters.regex('^ویرایش برنامه$'), edit),
                 MessageHandler(Filters.regex('^گرفتن برنامه ویرایش شده$'), time_table),
-                MessageHandler(Filters.regex('^گرفتن برنامه از یه راه دیگه$'), time_table_scrp_selenium),
+                # MessageHandler(Filters.regex('^گرفتن برنامه از یه راه دیگه$'), time_table_scrp_selenium),
                 MessageHandler(Filters.regex('^👈گرفتن برنامه از یه راه دیگه واسه دانشجوهایی که بدهی دارن$'), time_table_scrp_debtor),
                 MessageHandler(Filters.regex('^گرفتن برنامه ترمهای قبل$'), time_table_scrp_debtor),
                 MessageHandler(Filters.regex(r'^\d+ \: .*$'), time_table_scrp_debtor),
