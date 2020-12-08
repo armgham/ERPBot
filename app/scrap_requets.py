@@ -112,22 +112,46 @@ class ScrapperUsingRequest:
         access_token = json.loads(ci_page.text)['accessToken']
         return access_token
 
-    def get_report(self, dashboard_param):
-        # TODO: update for new design
-        report_request = self.http.post(f'{self.main_url}/Dashboard.aspx', params={'param': dashboard_param}, data={'Command': 'GET_TAB_INFO:020203'}, timeout=7, proxies=self.proxy)
-
-        report_param_search = re.search(r'\/Subsystem\/Amozesh\/Sabtenam\/Tasbir\/Report\/Report\.aspx\?param\=(?P<param>.*)', report_request.text)
-        if report_param_search is None:
-            if report_request.text.find('بدهکار') >= 0:
-                raise MyError('report problem because of debt', 'd')  # debt
-            elif 'eval' in report_request.text.lower():
-                raise MyError('report problem because of evallist', 'eval')  # evalList
-            else:
-                logger.info(report_request.text)
-                raise Exception('report_param or debt_message not found', 'rpnf')  # report param not found
-        report_param = report_param_search.group('param')
+    def get_report(self, access_token):
+        # OLD design
+        # report_request = self.http.post(f'{self.main_url}/Dashboard.aspx', params={'param': dashboard_param}, data={'Command': 'GET_TAB_INFO:020203'}, timeout=7, proxies=self.proxy)
+        # report_param_search = re.search(r'\/Subsystem\/Amozesh\/Sabtenam\/Tasbir\/Report\/Report\.aspx\?param\=(?P<param>.*)', report_request.text)
+        # if report_param_search is None:
+        #     if report_request.text.find('بدهکار') >= 0:
+        #         raise MyError('report problem because of debt', 'd')  # debt
+        #     elif 'eval' in report_request.text.lower():
+        #         raise MyError('report problem because of evallist', 'eval')  # evalList
+        #     else:
+        #         logger.info(report_request.text)
+        #         raise Exception('report_param or debt_message not found', 'rpnf')  # report param not found
+        # report_param = report_param_search.group('param')
+        # report_page = self.http.get(f'{self.main_url}/Subsystem/Amozesh/Sabtenam/Tasbir/Report/Report.aspx', params={'param': report_param}, timeout=7, proxies=self.proxy)
+        # return report_page
+        hs = self.http.headers
+        hs['Authorization'] = 'Bearer ' + access_token
+        profile_page = self.http.post(f'{self.main_url}/api/Dashbord_Profile_Std_CheckIs', data={'inMethode_Name': '/api/Dashbord_Profile_Std_CheckIs'}, headers=hs, timeout=7, proxies=self.proxy)
+        menu_access_token = json.loads(profile_page.text)['accessToken']
+        menu_hs = self.http.headers
+        menu_hs['Authorization'] = 'Bearer ' + menu_access_token
+        menu_page = self.http.post(f'{self.main_url}/api/Core_Menu_User', data={'inMethode_Name': '/api/Core_Menu_User'}, headers=menu_hs ,timeout=7, proxies=self.proxy)
+        id_menu_2 = ''
+        j = json.loads(menu_page.text)
+        for rc in j:
+            if rc['hafmanCode'] == '0202':
+                for c in rc['childs']:
+                    if c['hafmanCode'] == '020203':
+                        id_menu_2 = c['idMenu2']
+        if not id_menu_2:
+            raise MyError('فرم تثبیت تو سایت نیستش. از دکمه (گرفتن برنامه ترمهای قبل) استفاده کن و ترم آخر رو انتخاب کن', 'rpne')  # report param not exist
+        hs = self.http.headers
+        hs['Authorization'] = 'Bearer ' + access_token
+        d = {'idMenu2': id_menu_2, 'inMethode_Name': '/api/Core_Menu_Run'}
+        tran_page = self.http.post(f'{self.main_url}/SubSystem/Angular_Tran.aspx', data=json.dumps(d), headers=hs, timeout=7, proxies=self.proxy)
+        report_param = json.loads(tran_page.text)['outInfoJson']
+        report_param = report_param.replace('/Subsystem/Amozesh/Sabtenam/Tasbir/Report/Report.aspx?param=', '')
         report_page = self.http.get(f'{self.main_url}/Subsystem/Amozesh/Sabtenam/Tasbir/Report/Report.aspx', params={'param': report_param}, timeout=7, proxies=self.proxy)
         return report_page
+        
 
     def get_workbook(self, access_token): # dashboard_param):
         ## Old design
@@ -251,9 +275,7 @@ def main(user_data, chat_id, proxy, protocol='s', way='report', prev_term=False,
         
         if way == 'report':
             bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='گرفتن فرم تثبیت انتخاب واحد ...')
-            bot.send_message(chat_id=chat_id, text='فرم تثبیت تو سایت نیستش. از دکمه (گرفتن برنامه ترمهای قبل) استفاده کن و ترم آخر رو انتخاب کن', reply_markup=markup)
-            return 11
-            # TODO: update for new design
+            
             report_page = scrapper.get_report(dashboard_access_token)
             
             bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج اطلاعات از سایت ...')
@@ -292,6 +314,8 @@ def main(user_data, chat_id, proxy, protocol='s', way='report', prev_term=False,
         logger.warning(str(e.args))
         error_code = e.args[-1]
         if error_code == 'fs':
+            text_message = e.args[0]
+        elif error_code == 'rpne':
             text_message = e.args[0]
         # elif error_code == 'iup':
         #     text_message = 'رمز عبور یا نام کاربری اشتباه'
