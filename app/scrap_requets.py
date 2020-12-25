@@ -6,6 +6,8 @@ from requests.exceptions import ConnectionError
 import re
 import json
 import gc
+import traceback
+from random import randint
 
 from multiprocessing import Process
 import text_process
@@ -109,8 +111,8 @@ class ScrapperUsingRequest:
         d2 = {'inMethode_Name': '/api/Dashboard_CheckIs', 'url': '/Hermes', 'param': 'null', 'params': ''}
         ci_page = self.http.post(f'{self.main_url}/api/Dashboard_CheckIs', data=d2, headers=hs, timeout=7, proxies=self.proxy)
 
-        access_token = json.loads(ci_page.text)['accessToken']
-        return access_token
+        ci_j = json.loads(ci_page.text)
+        return ci_j
 
     def get_report(self, access_token):
         # OLD design
@@ -148,6 +150,8 @@ class ScrapperUsingRequest:
         d = {'idMenu2': id_menu_2, 'inMethode_Name': '/api/Core_Menu_Run'}
         tran_page = self.http.post(f'{self.main_url}/SubSystem/Angular_Tran.aspx', data=json.dumps(d), headers=hs, timeout=7, proxies=self.proxy)
         report_param = json.loads(tran_page.text)['outInfoJson']
+        if 'eval' in report_param.lower():
+            raise MyError('مثل اینکه باید فرم ارزیابی اساتید رو پر کنی.', 'eval')
         report_param = report_param.replace('/Subsystem/Amozesh/Sabtenam/Tasbir/Report/Report.aspx?param=', '')
         report_page = self.http.get(f'{self.main_url}/Subsystem/Amozesh/Sabtenam/Tasbir/Report/Report.aspx', params={'param': report_param}, timeout=7, proxies=self.proxy)
         return report_page
@@ -181,6 +185,8 @@ class ScrapperUsingRequest:
         d = {'idMenu2': id_menu_2, 'inMethode_Name': '/api/Core_Menu_Run'}
         tran_page = self.http.post(f'{self.main_url}/SubSystem/Angular_Tran.aspx', data=json.dumps(d), headers=hs, timeout=7, proxies=self.proxy)
         workbook_param = json.loads(tran_page.text)['outInfoJson']
+        if 'eval' in workbook_param.lower():
+            raise MyError('مثل اینکه باید فرم ارزیابی اساتید رو پر کنی.', 'eval')
         return workbook_param.replace('/Subsystem/Amozesh/Stu/WorkBook/StdWorkBook_Index.aspx?param=', '')
         
 
@@ -259,9 +265,70 @@ class ScrapperUsingRequest:
                                       parts_of_row[exams_time_column_index].find('span').text)
 
         return {'tabel': info, 'midterm': [], 'exams': exams_info}
+    def get_eval_list(self, e_l_url):
+        evalList_param_search =  re.search(r'\/SubSystem\/Amozesh\/Eval\/List\/EvalList\.aspx\?param\=(?P<param>.*)', e_l_url)
+        evalList_param = evalList_param_search.group('param')
 
+        evalList_page = self.http.get(f'{self.main_url}/SubSystem/Amozesh/Eval/List/EvalList.aspx', params={'param': evalList_param}, timeout=7, proxies=self.proxy)
+        soup = BeautifulSoup(evalList_page.text, 'lxml')
+        eval_list = soup.find_all('table')[-1].find_all('tr')
+        return eval_list, evalList_param
 
-# way : report or workbook
+    def get_professor_list(self, eval_elem, evalList_param):
+        hs = self.http.headers
+        hs['Referer'] = f'{self.main_url}/SubSystem/Amozesh/Eval/List/EvalList.aspx?param={evalList_param}'
+        Command_data = 'AnswerSubject♥' + eval_elem.find_all('td')[0].text + '♥' + eval_elem.find_all('td')[3].text
+        eval_request = self.http.post(f'{self.main_url}/SubSystem/Amozesh/Eval/List/EvalList.aspx', params={'param': evalList_param}, data={'Command': Command_data}, headers=hs, timeout=7, proxies=self.proxy)
+        eval_param = eval_request.text
+        eval_page = self.http.get(f'{self.main_url}/SubSystem/Amozesh/Eval/Answer/Subject/EvalAnswerSubject.aspx', params={'param': eval_param}, timeout=7, proxies=self.proxy)
+
+        inner_soup = BeautifulSoup(eval_page.text, 'lxml')
+        professor_list = inner_soup.find_all('table')[-1].find_all('tr')
+        return professor_list, eval_param
+
+    def get_questions(self, professor_elem, eval_param):
+        Command_data = 'Answer♥' + professor_elem.find_all('td')[0].text + '♥' + professor_elem.find_all('td')[1].text + '♥' + professor_elem.find_all('td')[2].text +\
+                        '♥' + professor_elem.find_all('td')[3].text + '♥' + professor_elem.find_all('td')[4].text + '♥' + professor_elem.find_all('td')[7].text
+        
+        professor_request = self.http.post(f'{self.main_url}/SubSystem/Amozesh/Eval/Answer/Subject/EvalAnswerSubject.aspx', params={'param': eval_param}, data={'Command': Command_data}, timeout=7, proxies=self.proxy)
+        questions_param = professor_request.text
+        questions_page = self.http.get(f'{self.main_url}/SubSystem/Amozesh/Eval/Answer/ListItems.aspx', params={'param': questions_param}, timeout=7, proxies=self.proxy)
+        qs_soup = BeautifulSoup(questions_page.text, 'lxml')
+        qs = qs_soup.find_all('table')[-1].find_all('tr')
+        return qs, questions_param
+    
+    def answer_qs_professor(self, qs, score, questions_param):
+        x = 'Insert:??*'
+        post_data = {}
+        one_random_q = randint(0, len(qs)-1)
+        for q_i, q in enumerate(qs):
+            nomre = score
+            if len(q.find_all('td')) > 3:
+                x += q.find_all('td')[3].text
+            x += '?'
+            if q_i == one_random_q:
+                if nomre == 8:
+                    nomre -= 1
+                elif nomre == 0:
+                    nomre += 1
+                else:
+                    nomre = nomre + [1, -1][randint(0, 1)]
+            for inp_el in q.find_all('input'):
+                # nomre = 1 # means 19
+                if inp_el['id'][:3] == 'rb' + str(nomre):
+                    post_data[inp_el['id']] = 'true'
+                    x += inp_el['value']
+            x += '?'
+            x += q.find_all('td')[10].text
+            x += '*'
+        x += ':'
+        post_data['Command'] = x
+        logger.info('EVALLLLLLLL  '+str(post_data))
+        professor_eval_request = self.http.post(f'{self.main_url}/SubSystem/Amozesh/Eval/Answer/ListItems.aspx', params={'param': questions_param}, data=post_data, timeout=7, proxies=self.proxy)
+        return 'ok' in professor_eval_request.text.lower()
+        
+
+# way : report or workbook or eval
 def main(user_data, chat_id, proxy, protocol='s', way='report', prev_term=False, number_of_term=-1):
     try:
         bot = helpers.get_bot()
@@ -271,9 +338,43 @@ def main(user_data, chat_id, proxy, protocol='s', way='report', prev_term=False,
         sent_message = sent_message.message_id
 
         # dash_param = scrapper.login(user_data['username'], user_data['password'])
-        dashboard_access_token = scrapper.login(user_data['username'], user_data['password'])
+        dashboard = scrapper.login(user_data['username'], user_data['password'])
+        dashboard_access_token = dashboard['accessToken']
+        if way == 'eval':
+            from time import sleep
+            score_markup = helpers.score_markup
+            bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج لیست ارزشیابی‌ها ...')
+            eval_list_url = dashboard['linkInfo']['url']
+            eval_list, evalList_param = scrapper.get_eval_list(eval_list_url)
+            while eval_list:
+                eval_elem = eval_list.pop()
+                bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج لیست استادها ...')
+                professor_list, eval_param = scrapper.get_professor_list(eval_elem, evalList_param)
+                while professor_list:
+                    professor_elem = professor_list[-1]
+                    qs, questions_param = scrapper.get_questions(professor_elem, eval_param)
+                    bot.send_message(chat_id=chat_id, text=professor_elem.find_all('td')[7].text + '    ' + professor_elem.find_all('td')[8].text + '\n نمره رو بزن:' , reply_markup=score_markup)
+                    timer = 0
+                    while timer <= 20:
+                        if user_data['nomre'] == -1:
+                            if timer == 20:
+                                bot.send_message(chat_id=chat_id, text='خب تایمت تموم شد! بای بای!', reply_markup=markup)
+                                return -1
+                            sleep(1.1)
+                            timer += 1
+                        else:
+                            break
+                    score = user_data['nomre']
+                    answer_result = scrapper.answer_qs_professor(qs, score, questions_param)
+                    if answer_result:
+                        professor_list.pop()
+                    else:
+                        bot.send_message(chat_id=chat_id, text='عه فکر کنم نمره ثبت نشد. دوباره !!')
+                    user_data['nomre'] = -1
+            bot.send_message(chat_id=chat_id, text='خب تموم شششددددد !!!!!', reply_markup=markup)
+            return 11
         
-        if way == 'report':
+        elif way == 'report':
             bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='گرفتن فرم تثبیت انتخاب واحد ...')
             
             report_page = scrapper.get_report(dashboard_access_token)
@@ -317,6 +418,8 @@ def main(user_data, chat_id, proxy, protocol='s', way='report', prev_term=False,
             text_message = e.args[0]
         elif error_code == 'rpne':
             text_message = e.args[0]
+        elif error_code == 'not_eval':
+            text_message = e.args[0]
         # elif error_code == 'iup':
         #     text_message = 'رمز عبور یا نام کاربری اشتباه'
         #     markup = helpers.markup
@@ -331,10 +434,9 @@ def main(user_data, chat_id, proxy, protocol='s', way='report', prev_term=False,
         #     reply_keyboard[1].append('👈گرفتن برنامه از یه راه دیگه واسه دانشجوهایی که بدهی دارن')
         #     from telegram import ReplyKeyboardMarkup
         #     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-        # elif error_code == 'eval':
-        #     text_message = 'مثل اینکه باید فرم ارزیابی اساتید رو پر کنی.' + '\n'
-        #     text_message += 'اگه حال نداری همه‌ی سوالای ارزشیابی رو جواب بدی میتونی از دکمه پیچوندن فرم ارزیابی استفاده کنی!'
-        #     markup = helpers.markup
+        elif error_code == 'eval':
+            text_message = e.args[0] + '\n'
+            text_message += 'اگه حال نداری همه‌ی سوالای ارزشیابی رو جواب بدی میتونی از دکمه پیچوندن فرم ارزیابی استفاده کنی!'
         bot.send_message(chat_id=chat_id, text='خب به ارور رسیدیم! : ' + text_message, reply_markup=markup)
 
     except ConnectionError as e:
@@ -350,7 +452,7 @@ def main(user_data, chat_id, proxy, protocol='s', way='report', prev_term=False,
     except Exception as e:
         logger.info(str(user_data['username'] + '  ||  ' + user_data['password']))
         logger.warning(str(e.args))
-        
+        traceback.print_exc()
         bot.send_message(chat_id=chat_id, text='خب به ارور عجیبی برخوردیم!', reply_markup=helpers.markup)
         
         # reply_keyboard = [x.copy() for x in helpers.reply_keyboard]
