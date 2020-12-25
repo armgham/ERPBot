@@ -9,7 +9,7 @@ import gc
 
 import config
 import time_table_file
-import scrap_requets
+import scrap_requests
 import helpers
 from multiprocessing import Process
 from SqlPersistence import SqlPersistence
@@ -85,7 +85,7 @@ def received_userpass(update, context):
     del user_data['choice']
     if 'time_table' in user_data:
         update.message.reply_text('خب الان برنامه رو از سایت میگیرم!')
-        _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), 'report', False, -1))
+        _thread.start_new_thread(scrap_requests.main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), 'report', False, -1))
         del user_data['time_table']
         # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
         return MAIN_CHOOSING
@@ -103,7 +103,7 @@ def time_table_scrp(update, context):
         bot.send_message(chat_id=update.message.chat_id, text='خب {} خودتو بده:'.format('نام کاربری'))
         user_data['choice'] = 'username'
         return USERPASS
-    _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), 'report', False, -1))
+    _thread.start_new_thread(scrap_requests.main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), 'report', False, -1))
     # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
     return MAIN_CHOOSING
 
@@ -125,7 +125,7 @@ def time_table_scrp_debtor(update, context):
         n = re.search(r'(?P<index_of_term>\d+) \: .*$', text).group('index_of_term')
         term_n = int(n)
         prev = True
-    _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), 'workbook', prev, term_n))
+    _thread.start_new_thread(scrap_requests.main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), 'workbook', prev, term_n))
     return MAIN_CHOOSING
 
 
@@ -137,9 +137,7 @@ def eval_scrp(update, context):
     update.message.reply_text('کاری که میکنم اینه که اسم استاد و درس رو بهت میگم و نمرش رو ازت میپرسم ۲۰ ثانیه وقت داری جواب بدی حالا این نمره رو به همه‌ی سوالا میدم فقط یکی از سوالا رو جواب متفاوت میدم که نظرت تو سیستم سایت ذخیره بشه چون اگه همه‌ی جوابا یه نمره باشه نظرت رو پاک میکنن!')
 
     user_data['nomre'] = -1
-    #import eval_scrp_requests
-    #_thread.start_new_thread(eval_scrp_requests.main, (user_data, update.message.chat_id, get_proxy(), get_protocol()))
-    _thread.start_new_thread(scrap_requets.main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), 'eval', False, -1))
+    _thread.start_new_thread(scrap_requests.main, (user_data, update.message.chat_id, get_proxy(), get_protocol(), 'eval', False, -1))
     # bot.send_message(chat_id=update.message.chat.id, text='یه ذره صبر کن!')
     return MAIN_CHOOSING
 

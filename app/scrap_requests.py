@@ -345,6 +345,8 @@ def main(user_data, chat_id, proxy, protocol='s', way='report', prev_term=False,
             score_markup = helpers.score_markup
             bot.edit_message_text(chat_id=chat_id, message_id=sent_message, text='استخراج لیست ارزشیابی‌ها ...')
             eval_list_url = dashboard['linkInfo']['url']
+            if not 'eval' in eval_list_url.lower():
+                raise MyError('مثل اینکه فرم ارزیابی پیدا نشده.', 'not_eval')
             eval_list, evalList_param = scrapper.get_eval_list(eval_list_url)
             while eval_list:
                 eval_elem = eval_list.pop()
