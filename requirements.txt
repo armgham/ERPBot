@@ -12,7 +12,7 @@ matplotlib==3.0.1
 mccabe==0.6.1
 mysql==0.0.2
 mysqlclient==1.4.6
-numpy==1.18.1
+numpy==1.22.0
 pycparser==2.19
 pylint==2.4.4
 pyparsing==2.4.6
